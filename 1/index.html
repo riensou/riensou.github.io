@@ -10,6 +10,11 @@
             margin: 20px;
             background-color: #f4f4f9;
         }
+        a {
+            display: inline-block;
+            color: #007bff;
+            text-decoration: none;
+        }
         h1 {
             color: #333;
             text-align: center;
@@ -102,7 +107,28 @@
 
         <h3>Introduction</h3>
         <p>
-            This section provides an overview of the project, discussing the goals and objectives related to the images of the Russian Empire. The dataset and methodology are introduced, along with the historical context of the images.
+            Between 1909 and 1915, <a href="https://en.wikipedia.org/wiki/Sergey_Prokudin-Gorsky">Sergey Mikhaylovich Prokudin-Gorsky</a> 
+            travelled across the Russian Empire and documented a variety of things through photography. Interestingly, despite this being 
+            well before the time of widespread color photography, his records give us a colorful insight into the Russian Empire. This is 
+            because he was ingenious enough to capture three exposures of every photo, using a red, green, and blue filter.
+
+            <br> <br>
+
+            Now, his photographs have been digitized by the Library of Congress. Each image is a vertical stack of the individual images 
+            captured by the blue, green, and red filters.
+        </p>
+
+        <div class="image-gallery">
+            <div>
+                <a href="./media/original_self_portrait.png" target="_blank">
+                    <img src="./media/original_self_portrait.png" alt="original_self_portrait" width="20%">
+                </a>
+            </div>
+        </div>
+
+        <p>
+            Using image processing techniques, one can convert the stacked images shown above into colorful photographs
+            showcasing the beauty of the Russian Empire in the early 20th century. 
         </p>
 
         <h3>Single-scale Alignment</h3>
