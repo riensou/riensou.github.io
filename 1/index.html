@@ -14,6 +14,27 @@
             color: #333;
             text-align: center;
         }
+        h2 {
+            color: #555;
+            text-align: center;
+        }
+        h3 {
+            color: #333;
+            margin-top: 40px;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 10px;
+            text-align: center;
+        }
+        h4 {
+            color: #131313;
+            text-align: center;
+        }
+        p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: left;
+        }
         img {
             display: block;
             margin: 20px auto;
@@ -27,12 +48,182 @@
             margin: 0 auto;
             text-align: center;
         }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px auto;
+            font-size: 16px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        th.green {
+            color: rgb(54, 215, 54);
+        }
+        th.red {
+            color: rgb(232, 57, 57);
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #ddd;
+        }
+        .image-gallery {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        .image-gallery div {
+            flex: 1;
+            margin: 0 10px;
+            text-align: center;
+        }
+        .image-gallery img {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+        }
+        .image-gallery p {
+            margin-top: 10px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Project 1: Images of the Russian Empire</h1>
+        <h2>Ryan Campbell</h2>
         <img src="./media/emir.jpg" alt="emir">
+
+        <h3>Introduction</h3>
+        <p>
+            This section provides an overview of the project, discussing the goals and objectives related to the images of the Russian Empire. The dataset and methodology are introduced, along with the historical context of the images.
+        </p>
+
+        <h3>Single-scale Alignment</h3>
+        <p>
+            In this section, we focus on single-scale alignment techniques used to process the images. The methods described here are suited for scenarios where image details are uniform across scales.
+        </p>
+
+        <div class="image-gallery">
+            <div>
+                <img src="./media/cathedral.jpg" alt="cathedral">
+                <p>Caption for Image 1</p>
+            </div>
+            <div>
+                <img src="./media/monastery.jpg" alt="monastery">
+                <p>Caption for Image 2</p>
+            </div>
+            <div>
+                <img src="./media/tobolsk.jpg" alt="tobolsk">
+                <p>Caption for Image 3</p>
+            </div>
+        </div>
+
+        <h3>Multiscale Alignment</h3>
+        <p>
+            This section delves into multiscale alignment, where the images undergo alignment at different scales to capture both small and large-scale details. This method allows for more refined and accurate image processing.
+        </p>
+
+        <div class="image-gallery">
+            <div>
+                <img src="./media/church.jpg" alt="church">
+                <p>Caption for Image 1</p>
+            </div>
+            <div>
+                <img src="./media/emir.jpg" alt="emir">
+                <p>Caption for Image 2</p>
+            </div>
+            <div>
+                <img src="./media/harvesters.jpg" alt="harvesters">
+                <p>Caption for Image 3</p>
+            </div>
+        </div>
+
+        <div class="image-gallery">
+            <div>
+                <img src="./media/icon.jpg" alt="icon">
+                <p>Caption for Image 1</p>
+            </div>
+            <div>
+                <img src="./media/lady.jpg" alt="lady">
+                <p>Caption for Image 2</p>
+            </div>
+            <div>
+                <img src="./media/melons.jpg" alt="melons">
+                <p>Caption for Image 3</p>
+            </div>
+        </div>
+
+        <div class="image-gallery">
+            <div>
+                <img src="./media/onion_church.jpg" alt="onion_church">
+                <p>Caption for Image 1</p>
+            </div>
+            <div>
+                <img src="./media/sculpture.jpg" alt="sculpture">
+                <p>Caption for Image 2</p>
+            </div>
+            <div>
+                <img src="./media/self_portrait.jpg" alt="self_portrait">
+                <p>Caption for Image 3</p>
+            </div>
+        </div>
+
+        <div class="image-gallery">
+            <div>
+                <img src="./media/three_generations.jpg" alt="three_generations">
+                <p>Caption for Image 1</p>
+            </div>
+            <div>
+                <img src="./media/train.jpg" alt="train">
+                <p>Caption for Image 2</p>
+            </div>
+        </div>
+
+        <h3>Bells and Whistles</h3>
+        <p>
+            Here, we discuss additional features and enhancements added to the project, such as advanced image filters, color correction, and texture mapping. These "bells and whistles" help improve the final image quality.
+        </p>
+
+        <h3>Appendix</h3>
+        <p>
+            ...
+        </p>
+
+        <h4>Displacements</h4>
+        <table>
+            <tr>
+                <th>filename</th>
+                <th>method</th>
+                <th class="green">green dx</th>
+                <th class="green">green dy</th>
+                <th class="red">red dx</th>
+                <th class="red">red dy</th>
+                <th>time</th>
+            </tr>
+            <tr><td>cathedral.jpg</td><td>single-scale</td><td>5</td><td>2</td><td>12</td><td>3</td><td>11.06</td></tr>
+            <tr><td>monastery.jpg</td><td>single-scale</td><td>-3</td><td>2</td><td>3</td><td>2</td><td>11.19</td></tr>
+            <tr><td>tobolsk.jpg</td><td>single-scale</td><td>3</td><td>3</td><td>6</td><td>3</td><td>11.09</td></tr>
+            <tr><td>church.tif</td><td>multiscale</td><td>25</td><td>4</td><td>59</td><td>-4</td><td>107.29</td></tr>
+            <tr><td>emir.tif</td><td>multiscale</td><td>50</td><td>22</td><td>105</td><td>40</td><td>110.21</td></tr>
+            <tr><td>harvesters.tif</td><td>multiscale</td><td>59</td><td>15</td><td>122</td><td>12</td><td>118.93</td></tr>
+            <tr><td>icon.tif</td><td>multiscale</td><td>39</td><td>16</td><td>89</td><td>23</td><td>124.10</td></tr>
+            <tr><td>lady.tif</td><td>multiscale</td><td>57</td><td>8</td><td>120</td><td>12</td><td>133.33</td></tr>
+            <tr><td>melons.tif</td><td>multiscale</td><td>80</td><td>10</td><td>177</td><td>13</td><td>112.90</td></tr>
+            <tr><td>onion_church.tif</td><td>multiscale</td><td>52</td><td>25</td><td>108</td><td>35</td><td>123.56</td></tr>
+            <tr><td>sculpture.tif</td><td>multiscale</td><td>33</td><td>-11</td><td>140</td><td>-27</td><td>140.27</td></tr>
+            <tr><td>self_portrait.tif</td><td>multiscale</td><td>78</td><td>28</td><td>175</td><td>37</td><td>159.43</td></tr>
+            <tr><td>three_generations.tif</td><td>multiscale</td><td>56</td><td>17</td><td>113</td><td>10</td><td>111.33</td></tr>
+            <tr><td>train.tif</td><td>multiscale</td><td>40</td><td>7</td><td>85</td><td>29</td><td>134.13</td></tr>
+        </table>
     </div>
 </body>
 </html>
