@@ -466,84 +466,7 @@
             </div>
         </div>
 
-        <h3>Bells and Whistles</h3>
-        <p>
-            ...
-
-            <div class="custom-carousel-container">
-                <button class="prev-btn hidden" onclick="prevImage()">&#10094;</button>
-                <div class="custom-carousel">
-                    <div>
-                        <a href="./media/emir_crop_work.jpeg" target="_blank">
-                            <img src="./media/emir_crop_work.jpeg" alt="emir crop work">
-                        </a>
-                        <p>Description for first image</p>
-                    </div>
-                    <div>
-                        <a href="./media/cropped_emir.jpg" target="_blank">
-                            <img src="./media/cropped_emir.jpg" alt="cropped emir">
-                        </a>
-                        <p>Description for second image</p>
-                    </div>
-                    <div>
-                        <a href="./media/icon_crop_work.jpeg" target="_blank">
-                            <img src="./media/icon_crop_work.jpeg" alt="icon crop work">
-                        </a>
-                        <p>Description for third image</p>
-                    </div>
-                    <div>
-                        <a href="./media/cropped_icon.jpg" target="_blank">
-                            <img src="./media/cropped_icon.jpg" alt="cropped icon">
-                        </a>
-                        <p>Description for fourth image</p>
-                    </div>
-                    <div>
-                        <a href="./media/melons_crop_work.jpeg" target="_blank">
-                            <img src="./media/melons_crop_work.jpeg" alt="melons crop work">
-                        </a>
-                        <p>Description for fifth image</p>
-                    </div>
-                    <div>
-                        <a href="./media/cropped_melons.jpg" target="_blank">
-                            <img src="./media/cropped_melons.jpg" alt="cropped melons">
-                        </a>
-                        <p>Description for sixth image</p>
-                    </div>
-                    <div>
-                        <a href="./media/self_portrait_crop_work.jpeg" target="_blank">
-                            <img src="./media/self_portrait_crop_work.jpeg" alt="self_portrait crop work">
-                        </a>
-                        <p>Description for seventh image</p>
-                    </div>
-                    <div>
-                        <a href="./media/cropped_self_portrait.jpg" target="_blank">
-                            <img src="./media/cropped_self_portrait.jpg" alt="cropped self_portrait">
-                        </a>
-                        <p>Description for eigth image</p>
-                    </div>
-                </div>
-                <button class="next-btn" onclick="nextImage()">&#10095;</button>
-            </div>
-            
-            <!-- Dots for 8 Images -->
-            <div class="carousel-dots" id="dots-carousel1">
-                <span class="dot active" onclick="showImage(0)"></span>
-                <span class="dot" onclick="showImage(1)"></span>
-                <span class="dot" onclick="showImage(2)"></span>
-                <span class="dot" onclick="showImage(3)"></span>
-                <span class="dot" onclick="showImage(4)"></span>
-                <span class="dot" onclick="showImage(5)"></span>
-                <span class="dot" onclick="showImage(6)"></span>
-                <span class="dot" onclick="showImage(7)"></span>
-            </div>
-        </p>
-
-        <h3>Appendix</h3>
-        <p>
-            ...
-        </p>
-
-        <h4>Displacements</h4>
+        <h3>Table of Displacements</h3>
         <table>
             <tr>
                 <th>filename</th>
@@ -569,6 +492,131 @@
             <tr><td>three_generations.tif</td><td>multiscale</td><td>56</td><td>17</td><td>113</td><td>10</td><td>111.33</td></tr>
             <tr><td>train.tif</td><td>multiscale</td><td>40</td><td>7</td><td>85</td><td>29</td><td>134.13</td></tr>
         </table>
+
+        <h3>Bells and Whistles</h3>
+        <p>
+            Notice that after the alignment process is complete, each image is left with some borders. As these
+            borders are not the same for each image, some custom border-cropping procedure is needed to clean
+            up the photos (rather than setting a default crop). Thus, I devised the following procedure to automatically
+            crop the aligned photos:
+            
+            <br>
+            <br>
+
+            First, use the calculated 'optimal' displacement to make the obvious cuts. For example, if the red channel is shifted to 
+            the right by 20 pixels, then clearly the leftmost 20 pixels of the overall image can be safely cut as the lack of red
+            will at the very least create an artificial border (if there isn't already a border there). Since the blue channel stays fixed,
+            any displacement of the green and red channels gives us some safe cuts to make, as we won't want any parts of our picture to
+            not contain all three color channels.
+
+            <br>
+            <br>
+
+            Second, convert the initial crop to grayscale in the following ways: (1) using all color channels along with the weights for each 
+            channel specified by <a href="https://scikit-image.org/docs/stable/api/skimage.color.html#skimage.color.rgb2gray">
+            <code>skimage.color.rgb2array</code> </a>, (2) dropping the red channel, (3) dropping the green channel, and (4) 
+            dropping the blue channel. The reason for dropping channels is we want to be able to detect color edges beyond just black and white,
+            and this is harder to do if we only use a singular gray image.
+
+            <br>
+            <br>
+
+            Third, run <a href="https://ieeexplore.ieee.org/document/4767851"> Canny edge detection </a> on each grayscale image to get an approximation of the edges present in the image. I used the 
+            <a href="https://scikit-image.org/docs/0.21.x/api/skimage.feature.html#skimage.feature.canny">
+            <code>skimage.feature.canny</code> </a> implementation, with &sigma;=3 and default values for everything else. Without runniny Canny edge 
+            detection, the results of the next step were too unpredictable and uncontrolled.
+
+            <br>
+            <br>
+
+            Fourth, run <a href="https://ieeexplore.ieee.org/document/786993">probabilistic Hough transform</a> on the edges from the previous step, checking for 
+            vertical and horizontal lines. I used the <a href="https://scikit-image.org/docs/stable/api/skimage.transform.html#skimage.transform.probabilistic_hough_line">
+            <code>skimage.transform.probabilistic_hough_line</code></a> implementation, with threshold=5, line_length=200, line_gap=50 for the horizontal
+            line check and threshold=50, line_length=300, line_gap=25 for the vertical line check. I made the constraints harder on the vertical lines because
+            I found my algorithm struggling more with cropping horizontally than vertically.
+
+            <br>
+            <br>
+
+            Finally, use the detected lines (all of them from each of the four grayscale images) on the outer 10% of the image to make the final crop. 
+            Following this process yielded the following results:
+
+            <div class="custom-carousel-container">
+                <button class="prev-btn hidden" onclick="prevImage()">&#10094;</button>
+                <div class="custom-carousel">
+                    <div>
+                        <a href="./media/emir_crop_work.jpeg" target="_blank">
+                            <img src="./media/emir_crop_work.jpeg" alt="emir crop work">
+                        </a>
+                        <p>The cropping process for emir.tif</p>
+                    </div>
+                    <div>
+                        <a href="./media/cropped_emir.jpg" target="_blank">
+                            <img src="./media/cropped_emir.jpg" alt="cropped emir">
+                        </a>
+                        <p>The final crop of emir.tif</p>
+                    </div>
+                    <div>
+                        <a href="./media/icon_crop_work.jpeg" target="_blank">
+                            <img src="./media/icon_crop_work.jpeg" alt="icon crop work">
+                        </a>
+                        <p>The cropping process for icon.tif</p>
+                    </div>
+                    <div>
+                        <a href="./media/cropped_icon.jpg" target="_blank">
+                            <img src="./media/cropped_icon.jpg" alt="cropped icon">
+                        </a>
+                        <p>The final crop of icon.tif</p>
+                    </div>
+                    <div>
+                        <a href="./media/melons_crop_work.jpeg" target="_blank">
+                            <img src="./media/melons_crop_work.jpeg" alt="melons crop work">
+                        </a>
+                        <p>The cropping process for melons.tif</p>
+                    </div>
+                    <div>
+                        <a href="./media/cropped_melons.jpg" target="_blank">
+                            <img src="./media/cropped_melons.jpg" alt="cropped melons">
+                        </a>
+                        <p>The final crop of melons.tif</p>
+                    </div>
+                    <div>
+                        <a href="./media/self_portrait_crop_work.jpeg" target="_blank">
+                            <img src="./media/self_portrait_crop_work.jpeg" alt="self_portrait crop work">
+                        </a>
+                        <p>The cropping process for self_portrait.tif</p>
+                    </div>
+                    <div>
+                        <a href="./media/cropped_self_portrait.jpg" target="_blank">
+                            <img src="./media/cropped_self_portrait.jpg" alt="cropped self_portrait">
+                        </a>
+                        <p>The final crop of self_portrait.tif</p>
+                    </div>
+                </div>
+                <button class="next-btn" onclick="nextImage()">&#10095;</button>
+            </div>
+            
+            <!-- Dots for 8 Images -->
+            <div class="carousel-dots" id="dots-carousel1">
+                <span class="dot active" onclick="showImage(0)"></span>
+                <span class="dot" onclick="showImage(1)"></span>
+                <span class="dot" onclick="showImage(2)"></span>
+                <span class="dot" onclick="showImage(3)"></span>
+                <span class="dot" onclick="showImage(4)"></span>
+                <span class="dot" onclick="showImage(5)"></span>
+                <span class="dot" onclick="showImage(6)"></span>
+                <span class="dot" onclick="showImage(7)"></span>
+            </div>
+        </p>
+
+        <br>
+
+        <p>
+            All black and white borders were successfully cropped. Some remnants or partial color borders remained, so my 
+            algorithm has room for improvement there. Originally, when I only used the full grayscale image, my algorithm did
+            even worse with the partial color borders, but including the grayscale images with each of the channels removed
+            improved my results significantly.
+        </p>
     </div>
 
 <script>
