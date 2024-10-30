@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS 180 Project 3: Face Morphing</title>
+    <style>
+        body {
+            background-color: #e6ffe6; /* Light green for the sides */
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px; /* Adjust the width of your content */
+            margin: 0 auto; /* Center the content */
+            background-color: #ffffff; /* White background for the content */
+        }
+
+        header {
+            background-color: #006600; /* Darker green for the header */
+            padding: 20px;
+            color: #ffffff; /* White text for the header */
+            text-align: center;
+            width: 100%; /* Ensure the header spans the full width */
+            box-sizing: border-box;
+        }
+
+        h1 {
+            margin: 0;
+        }
+
+        h2, h3 {
+            color: #000000; /* Black for headings */
+        }
+
+        .section {
+            text-align: left; /* Align section content to the left */
+            margin-bottom: 30px;
+            padding: 0 20px; /* Add some padding for better spacing */
+        }
+
+        .section-title {
+            text-align: center; /* Center-align the section title */
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .image-grid {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .image-grid figure {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+        }
+
+        .image-grid img {
+            max-width: 200px;
+            max-height: 200px;
+            object-fit: contain;
+        }
+
+        .image-grid figcaption {
+            margin-top: 5px;
+            font-size: 0.9em;
+            color: #555; /* Light gray for the caption text */
+            text-align: center;
+            margin-left: 5px; /* Increase left margin */
+            margin-right: 5px; /* Increase right margin */
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>CS 180 Project 3: Face Morphing</h1><br>
+        Ryan Campbell
+    </header>
+    <br>
+    <div class="container">
+        <div class="section">
+            <h2 class="section-title">Introduction</h2>
+            <p>
+                In this project, I morph my face onto other people, work with a face dataset to compute the mean face of a 
+                population, and extrapolate from a population mean to caricaturize myself. Instead of simply averaging the pixels
+                of face images, one can be more intelligent, by providing correspondence points between images and shifting
+                while cross-dissolving. This allows us to connect the eyes, mouth, chin, ears, etc. of each face to the other face.
+            </p>
+        </div>
+        <div class="section">
+            <h2 class="section-title">Part 1. Defining Correspondences</h2>
+            <p>
+                First, I select two images of faces. On the left, is Ryan Campbell (me!) and on the right is George Clooney. 
+                Importantly, we are both similar sizes in the frame and facing similar angles. This will provide a smooth morph
+                and clearer "Mid-way Face" down the line.
+            </p>
+            <br><br><br>
+            <div class="image-grid">
+                <figure>
+                    <img src="media/ryan_and_george.jpg" alt="Sample Image 1" style="transform: scale(2);">
+                    <!-- <figcaption>Sample Image 1</figcaption> -->
+                </figure>
+            </div>
+            <br><br><br>
+            <p>
+                Next, I define correspondences between the two images, as well as computing the 
+                <a href="https://en.wikipedia.org/wiki/Delaunay_triangulation#:~:text=In%20computational%20geometry%2C%20a%20Delaunay,tends%20to%20avoid%20sliver%20triangles.">Delaunay triangulation</a>
+                of their respective points. This gives us triangles to match for each image. I chose 32 correspondence points
+                on each face, which should be plenty.
+            </p>
+            <br><br><br>
+            <div class="image-grid">
+                <figure>
+                    <img src="media/ryan_and_george_triangle.jpg" alt="Sample Image 1" style="transform: scale(2);">
+                    <!-- <figcaption>Sample Image 1</figcaption> -->
+                </figure>
+            </div>
+            <br><br><br>
+        </div>
+        <div class="section">
+            <h2 class="section-title">Part 2. Computing the "Mid-way Face"</h2>
+            <p>
+                In order to compute the "Mid-way Face", we (1) compute the average shape, (2) warp each face into that shape, 
+                and (3) average the warped pixel values together (cross-dissolve the image colors). 
+                <br><br>
+                The first step, computing the average shape, is easy. Simply average each correspondence point together. That is,
+                compute p_mid = p_1 * 0.5 + p_2 * 0.5 for each correspondence point pair p_1, p_2. The following shows this process,
+                with the triangulation added as well.
+            </p>
+            <br><br><br><br>
+            <div class="image-grid">
+                <figure>
+                    <img src="media/triangulation.jpg" alt="Sample Image 1" style="transform: scale(3);">
+                    <!-- <figcaption>Sample Image 1</figcaption> -->
+                </figure>
+            </div>
+            <br><br><br><br>
+            <p>
+                Next, we must warp each face into the newly calculated shape. In order to do this, we consider each of the 
+                triangles mentioned previously. Our goal is to map each triangle to its corresponding "mid-way" triangle. We
+                can calculate the affine transformation between each triangle and use it to perform an inverse warp. We use
+                an inverse warp because it leaves no gaps in the images, using interpolation to fill in anytime a target point 
+                is in between pixels. 
+                <br><br>
+                The following shows the result of warping each image. The change is very noticeable around
+                the eyes and general face shape.
+            </p>
+            <div class="image-grid">
+                <figure>
+                    <img src="media/ryanwarped.jpg" alt="Sample Image 1">
+                    <figcaption>Ryan warped to the "mid-way" shape</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/georgewarped.jpg" alt="Sample Image 1">
+                    <figcaption>George warped to the "mid-way" shape</figcaption>
+                </figure>
+            </div>
+            <p>
+                Finally, now that the images have been warped to match the "mid-way" shape, we can cross-dissolve the color. 
+                That is, compute F_midway = F_warpedryan * 0.5 + F_warpedgeorge * 0.5. This yields the following "Mid-way Face":
+            </p>
+            <div class="image-grid">
+                <figure>
+                    <img src="media/ryan-george_mid-way.jpg" alt="Sample Image 1">
+                    <figcaption>Ryan-George "Mid-way Face"</figcaption>
+                </figure>
+            </div>
+            <p>
+                The entire process to create the above face can be summarized as shown below:
+            </p>
+            <br><br><br><br><br>
+            <div class="image-grid">
+                <figure>
+                    <img src="media/midway_process.jpg" alt="Sample Image 1" style="transform: scale(5);">
+                    <!-- <figcaption>Ryan-George "Mid-way Face"</figcaption> -->
+                </figure>
+            </div>
+            <br><br><br><br><br>
+        </div>
+        <div class="section">
+            <h2 class="section-title">Part 3. The Morph Sequence</h2>
+            <p>
+                In order to generate a morph sequence, instead of creating a mean face, we can use multiple different
+                ratios of warping and cross-dissolving. We can do multiple ratios starting from 0 (original Ryan) and going
+                to 1 (original George). With finer increments, we get a smoother video. The following morph gif is 50 frames, 
+                with the warp_frac and dissolve_frac being split equally 50 times within [0, 1]. As can be seen, this is
+                sufficient to produce a smooth gif.
+            </p>
+            <div class="image-grid">
+                <figure>
+                    <img src="media/ryan-george.gif" alt="Sample Image 1">
+                    <figcaption>Ryan-George morph sequence</figcaption>
+                </figure>
+            </div>
+            <p>
+                For fun, I also produced a morph sequence with me and a minion. This didn't turn out quite as well as the 
+                correspondence points were not as clear as they were for me and George. To try to make up for this, I did 100
+                frames instead of 50, but the worse correspondences still led to an overall worse result than the Ryan-George 
+                morph.
+            <p>
+            <div class="image-grid">
+                <figure>
+                    <img src="media/minion.jpg" alt="Sample Image 1">
+                    <figcaption>Original minion</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/ryan_glasses_small.jpg" alt="Sample Image 1">
+                    <figcaption>Original Ryan (with glasses)</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/ryan-minion.gif" alt="Sample Image 1">
+                    <figcaption>Minion-Ryan morph sequence</figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="section">
+            <h2 class="section-title">Part 4. The "Mean face" of a population</h2>
+            <p>
+                For the next part of this project, I utilized the 
+                <a href="https://fei.edu.br/~cet/facedatabase.html">FEI Face Database</a>. This is a Brazilian 
+                database made of face images from 2005-2006 from the Artificial Intelligence Laboratory of FEI 
+                in São Bernardo do Campo, São Paulo, Brazil. I utilized 400 photos taken from 200 people, mainly 
+                represented by students and staff at FEI, between 19 and 40 years (100 men and 100 women). There 
+                are two groups of photos (no smiling and smiling), of which each person has one photo in.
+                <br><br>
+                The following are some example photos. Note that for this project, I actually only used the spatially
+                normalized versions of each face, as these faces had correspondence points labeled consistently with
+                the rest of the images. 
+            </p>
+            <div class="image-grid">
+                <figure>
+                    <img src="media/FEI_faces/faces/1a.jpg" alt="Sample Image 1">
+                    <figcaption>1a.jpg from FEI</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/FEI_faces/faces/1b.jpg" alt="Sample Image 1">
+                    <figcaption>1b.jpg from FEI</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/FEI_faces/normalized_faces/1a.jpg" alt="Sample Image 1">
+                    <figcaption>1a.jpg from FEI <br>(spatially normalized)</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/FEI_faces/normalized_faces/1b.jpg" alt="Sample Image 1">
+                    <figcaption>1b.jpg from FEI <br>(spatially normalized)</figcaption>
+                </figure>
+            </div>
+            <br>
+            <div class="image-grid">
+                <figure>
+                    <img src="media/FEI_faces/faces/66a.jpg" alt="Sample Image 1">
+                    <figcaption>66a.jpg from FEI</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/FEI_faces/faces/66b.jpg" alt="Sample Image 1">
+                    <figcaption>66b.jpg from FEI</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/FEI_faces/normalized_faces/66a.jpg" alt="Sample Image 1">
+                    <figcaption>66a.jpg from FEI <br>(spatially normalized)</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/FEI_faces/normalized_faces/66b.jpg" alt="Sample Image 1">
+                    <figcaption>66b.jpg from FEI <br>(spatially normalized)</figcaption>
+                </figure>
+            </div>
+            <br>
+            <div class="image-grid">
+                <figure>
+                    <img src="media/FEI_faces/faces/124a.jpg" alt="Sample Image 1">
+                    <figcaption>124a.jpg from FEI</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/FEI_faces/faces/124b.jpg" alt="Sample Image 1">
+                    <figcaption>124b.jpg from FEI</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/FEI_faces/normalized_faces/124a.jpg" alt="Sample Image 1">
+                    <figcaption>124a.jpg from FEI <br>(spatially normalized)</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/FEI_faces/normalized_faces/124b.jpg" alt="Sample Image 1">
+                    <figcaption>124b.jpg from FEI <br>(spatially normalized)</figcaption>
+                </figure>
+            </div>
+            <br>
+            <div class="image-grid">
+                <figure>
+                    <img src="media/FEI_faces/faces/160a.jpg" alt="Sample Image 1">
+                    <figcaption>160a.jpg from FEI</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/FEI_faces/faces/160b.jpg" alt="Sample Image 1">
+                    <figcaption>160b.jpg from FEI</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/FEI_faces/normalized_faces/160a.jpg" alt="Sample Image 1">
+                    <figcaption>160a.jpg from FEI <br>(spatially normalized)</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/FEI_faces/normalized_faces/160b.jpg" alt="Sample Image 1">
+                    <figcaption>160b.jpg from FEI <br>(spatially normalized)</figcaption>
+                </figure>
+            </div>
+            <br>
+            To see an example of correspondences labeled for one of the above, see below. The FEI dataset 
+            defines 46 correspondence points for each face, but I artificially add 4 more in the corners to get a 
+            total of 50 correspondence points.
+            <div class="image-grid">
+                <figure>
+                    <img src="media/1a_triangulation.jpg" alt="Sample Image 1">
+                    <figcaption>1a.jpg from FEI (triangulation)</figcaption>
+                </figure>
+            </div>
+            <p>
+                Averaging together each groups' (no smiling and smiling) correspondence points, warping each face into that average,
+                and then cross-dissolving over each face yields the following "Mean Face" of each population:
+            </p>
+            <div class="image-grid">
+                <figure>
+                    <img src="media/FEI_a_average.jpg" alt="Sample Image 1">
+                    <figcaption>FEI mean face of group a</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/FEI_b_average.jpg" alt="Sample Image 1">
+                    <figcaption>FEI mean face of group b</figcaption>
+                </figure>
+            </div>
+            <p>
+                The following are some examples of images in the dataset being warped to the average correspondence points
+                for their respective group.
+            </p>
+            <div class="image-grid">
+                <figure>
+                    <img src="media/20a_warp.jpg" alt="Sample Image 1">
+                    <figcaption>20a → average a shape</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/20b_warp.jpg" alt="Sample Image 1">
+                    <figcaption>20b → average b shape</figcaption>
+                </figure>
+            </div>
+            <br>
+            <div class="image-grid">
+                <figure>
+                    <img src="media/78a_warp.jpg" alt="Sample Image 1">
+                    <figcaption>78a → average a shape</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/78b_warp.jpg" alt="Sample Image 1">
+                    <figcaption>78b → average b shape</figcaption>
+                </figure>
+            </div>
+            <br>
+            <div class="image-grid">
+                <figure>
+                    <img src="media/150a_warp.jpg" alt="Sample Image 1">
+                    <figcaption>150a → average a shape</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/150b_warp.jpg" alt="Sample Image 1">
+                    <figcaption>150b → average b shape</figcaption>
+                </figure>
+            </div>
+            <p>
+                Next, I can warp myself into the average face, as well as the average face into me. 
+            </p>
+            <div class="image-grid">
+                <figure>
+                    <img src="media/ryan_to_mean.jpg" alt="Sample Image 1">
+                    <figcaption>ryan → average a</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/mean_to_ryan.jpg" alt="Sample Image 1">
+                    <figcaption>average a → ryan</figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="section">
+            <h2 class="section-title">Part 5. Caricatures: Extrapolating from the mean</h2>
+            <p>
+                Next, I can use the mean face calculated from the previous step to extrapolate my own face to create
+                a caricature that is more 'ryan-like'. The intuition goes as follows: let F_R and F_M be the Ryan face
+                and mean face respectively, then F_R - alpha * (F_M - F_R) is an extrapolation from the mean. 
+                <br><br>
+                In order to actually use this intuition, we calculate the extrapolated correspondence points according 
+                to the expression R - alpha * (M - R), where R is the points for Ryan and M is the mean face points. Then,
+                we warp Ryan to these extrapolated points. The following shows this carried out for various values of alpha.
+            </p>
+            <br><br><br><br>
+            <div class="image-grid">
+                <figure>
+                    <img src="media/extra_ryan.jpg" alt="Sample Image 1" style="transform: scale(5);">
+                    <figcaption></figcaption>
+                </figure>
+            </div>
+            <br><br><br><br>
+            <p>
+                Visually, these results seem to indicate that I have a larger nose and forehead than the mean face (yikes!), 
+                as both of these features seem to expand as alpha increases.
+            </p>
+        </div>
+        <div class="section">
+            <h2 class="section-title">Bells and Whistles</h2>
+            <p>
+                Here is a morphing music video of myself through the ages: <a href="https://youtu.be/X7S-Wi3clXQ">"The Aging Process"</a>.
+            </p>
+        </div>
+        <br>
+    </div>
+    <br>
+</body>
+</html>

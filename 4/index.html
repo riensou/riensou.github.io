@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS 180 Project 4: [Auto]Stitching Photo Mosaics</title>
+    <style>
+        body {
+            background-color: #ffe6cc; /* Light orange for the sides */
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px; /* Adjust the width of your content */
+            margin: 0 auto; /* Center the content */
+            background-color: #ffffff; /* White background for the content */
+        }
+
+        header {
+            background-color: #ff6600; /* Darker orange for the header */
+            padding: 20px;
+            color: #ffffff; /* White text for the header */
+            text-align: center;
+            width: 100%; /* Ensure the header spans the full width */
+            box-sizing: border-box;
+        }
+
+        h1 {
+            margin: 0;
+        }
+
+        h2, h3 {
+            color: #000000; /* Black for headings */
+        }
+
+        .section {
+            text-align: left; /* Align section content to the left */
+            margin-bottom: 30px;
+            padding: 0 20px; /* Add some padding for better spacing */
+        }
+
+        .section-title {
+            text-align: center; /* Center-align the section title */
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .image-grid {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .image-grid figure {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+        }
+
+        .image-grid img {
+        max-width: 100%;
+        max-height: 100%;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+    }
+
+        .image-grid figcaption {
+            margin-top: 5px;
+            font-size: 0.9em;
+            color: #555; /* Light gray for the caption text */
+            text-align: center;
+            margin-left: 5px; /* Increase left margin */
+            margin-right: 5px; /* Increase right margin */
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>CS 180 Project 4: [Auto]Stitching Photo Mosaics</h1><br>
+        Ryan Campbell
+    </header>
+    <br>
+    <div class="container">
+        <br>
+        <div class="section">
+            <h2 class="section-title">Introduction</h2>
+            <p>
+                This project deals with warping images in order to create image mosaics. After taking more than one photo of
+                something, with a slight rotation in each photo, we can create an image mosaic by computing their Homographies
+                from correspondence points, and then warping them and blending them.
+            </p>
+        </div>
+        <div class="section">
+            <h2 class="section-title">Shoot the Pictures</h2>
+            <p>
+                When taking pictures, it is important to fix the center of projection so that the pixels correspond to
+                roughly the same rays of light and the geometry concerning homographies is accurate. In order to accomplish this,
+                I held my phone in such a way that turning it was about the vertical line through the middle of my lens. This approach
+                led to pictures that look like the following.
+            </p>
+            <div class="image-grid">
+                <figure>
+                    <img src="media_updated/etchs.jpg" alt="Sample Image 1">
+                </figure>
+            </div>
+            <div class="image-grid">
+                <figure>
+                    <img src="media_updated/havens.jpg" alt="Sample Image 1">
+                </figure>
+            </div>
+            <div class="image-grid">
+                <figure>
+                    <img src="media_updated/studyrooms.jpg" alt="Sample Image 1">
+                </figure>
+            </div>
+        </div>
+        <div class="section">
+            <h2 class="section-title">Recover Homographies </h2>
+            <p>
+                From here, one can manually label correspondence points between each image. Though only four perfect correspondence points
+                is required in theory, more points yields better results as there may be error in (1) the rotation of the camera about the 
+                center of projection and (2) the labeling of correspondence points. Thus, I made sure to label more than 4 points, spread
+                roughly uniformly throughout the image. Below, the manually labeled correspondence points for the above example images are shown,
+                with lines drawn between each correspondence point.
+            </p>
+            <div class="image-grid">
+                <figure>
+                    <img src="media_updated/etchs_correspondences.jpg" alt="Sample Image 1">
+                </figure>
+            </div>
+            <div class="image-grid">
+                <figure>
+                    <img src="media_updated/havens_correspondences.jpg" alt="Sample Image 1">
+                </figure>
+            </div>
+            <div class="image-grid">
+                <figure>
+                    <img src="media_updated/studyrooms_correspondences.jpg" alt="Sample Image 1">
+                </figure>
+            </div>
+            <p>
+                From here, we can simply use the formula presented in lecture (shown below) to compute the homographies from either image 
+                to either image, noting that we can set the scale factor i to be equal to 1. This shows why we would only theoretically need 
+                4 points, as there are 8 unkowns.
+            </p>
+            <div class="image-grid">
+                <figure>
+                    <img src="media/recover_homographies/compute_homography.jpg" alt="Sample Image 1">
+                    <!-- <figcaption>Sample Image 1</figcaption> -->
+                </figure>
+            </div>
+        </div>
+        <div class="section">
+            <h2 class="section-title">Warp the Images</h2>
+            <p>
+                Now we can compute the homographies from each image to the other image. This allows us to see what im1 would look like in the 
+                perspective of im2 and vice versa. 
+            </p>
+            <div class="image-grid">
+                <figure>
+                    <img src="media_updated/etchs_warped.jpg" alt="Sample Image 1">
+                    <!-- <figcaption>Sample Image 1</figcaption> -->
+                </figure>
+            </div>
+            <div class="image-grid">
+                <figure>
+                    <img src="media_updated/havens_warped.jpg" alt="Sample Image 1">
+                    <!-- <figcaption>Sample Image 1</figcaption> -->
+                </figure>
+            </div>
+            <div class="image-grid">
+                <figure>
+                    <img src="media_updated/studyrooms_warped.jpg" alt="Sample Image 1">
+                    <!-- <figcaption>Sample Image 1</figcaption> -->
+                </figure>
+            </div>
+        </div>
+        <div class="section">
+            <h2 class="section-title">Image Rectification</h2>
+            <p>
+                Now that we can compute homographies and warp images, we have all of the tools necessary to rectify images. In order to do this,
+                we can take a picture of something we know has a rectangular shape. Then, we can choose a rectangular shape we want the object to
+                fit into. Next, we compute the corresponding homography and use it to warp the image, rectifying it. 
+                
+                <br><br>
+
+                Some examples are shown below.
+            </p>
+            <div class="image-grid">
+                <figure>
+                    <img src="media_updated/rectify/happy_rectify.jpg" alt="Sample Image 1">
+                    <!-- <figcaption>Sample Image 1</figcaption> -->
+                </figure>
+            </div>
+            <div class="image-grid">
+                <figure>
+                    <img src="media_updated/rectify/moffit_rectify.jpg" alt="Sample Image 1">
+                    <!-- <figcaption>Sample Image 1</figcaption> -->
+                </figure>
+            </div>
+            <div class="image-grid">
+                <figure>
+                    <img src="media_updated/rectify/minions_rectify.jpg" alt="Sample Image 1">
+                    <!-- <figcaption>Sample Image 1</figcaption> -->
+                </figure>
+            </div>
+            
+            <p>
+                Note that for some rectifications, this can lead to extreme warpings on the rest of the image, as seen in the last
+                example with the happy face.
+            </p>
+        </div>
+        <div class="section">
+            <h2 class="section-title">Blend the images into a mosaic</h2>
+            <p>
+               Now, we return to the original goal, creating an image mosaic. In order to do this, we must (1) warp the images to a common
+               perspective, (2) align the images based on some anchor points, and (3) blend the images to reduce artifacts. We have already
+               solved (1), so all that remains is to align the images based on anchor points and to perform blending.
+               
+               <br><br>
+
+               First, we find an anchor point. Originally, I chose the average of all of the correspondences as my anchor point. However, this
+               led to the images ending up unaligned. This is because the average point is a linear combination of all of the points, but homographies
+               are not purely linear, so the average of each image's correspondence points might not correspond to each other. Thus, I chose an 
+               anchor point by arbitrarily selecting corresponding correspondence points. 
+               
+               <br><br>
+               
+               Then, we choose an image to fix and an image to warp. For the warped image, we compute its warped anchor point, which we use to align 
+               to the image that we leave unwarped. From here, we can naively generate image mosaics, ignoring the blending step (3) for now. The 
+               following are some examples of this process so far:
+            </p>
+            <div class="image-grid">
+            <figure>
+                <img src="media_updated/unblended_etch_mosaic.jpg" alt="Sample Image 1">
+            </figure>
+            </div>
+            <br>
+            <div class="image-grid">
+                <figure>
+                    <img src="media_updated/unblended_soccer_mosaic.jpg" alt="Sample Image 1">
+                </figure>
+                </div>
+            <p>
+                Clearly, this produces some pretty heavy artifacts, thus blending is required to produce quality image mosaics. In order
+                to do blending, we use the procedure done in <a href="../2/index.html">project 2</a>, with Gaussian and Laplacian pyramids. This significantly improves
+                the results, as shown below:
+            </p>
+            <div class="image-grid">
+            <figure>
+                <img src="media_updated/etch_mosaic.jpg" alt="Sample Image 1">
+            </figure>
+            </div>
+            <br>
+            <div class="image-grid">
+            <figure>
+                <img src="media_updated/haven_mosaic.jpg" alt="Sample Image 1">
+            </figure>
+            </div>
+            <br>
+            <div class="image-grid">
+            <figure>
+                <img src="media_updated/studyroom_mosaic.jpg" alt="Sample Image 1">
+            </figure>
+            </div>
+            <br>
+            <div class="image-grid">
+            <figure>
+                <img src="media_updated/soccer_mosaic.jpg" alt="Sample Image 1">
+            </figure>
+            </div>
+            <br>
+            <div class="image-grid">
+            <figure>
+                <img src="media_updated/room_mosaic.jpg" alt="Sample Image 1">
+            </figure>
+            </div>
+            <p>
+                Note that for some of the mosaics above (the soccer field and messy room), multiple images are stitched to one base image. This is done by repeating the 
+                anchor point process multiple for times (once per image attached to the main image).
+            </p>
+        </div>
+        <div class="section">
+            <h2 class="section-title">Detecting Harris interest points</h2>
+            <p>
+                Next, we want to manually identify correspondence points in order to fully automate the image stitching process. We roughly
+                follow the process described in <a href="https://inst.eecs.berkeley.edu/~cs180/fa24/hw/proj4/Papers/MOPS.pdf">“Multi-Image Matching using Multi-Scale Oriented Patches” by Brown et al.</a> 
+                
+                <br><br>
+                First, we identify potential candidates by using Harris corner detection. The following showcases the strongest 2000 candidates
+                (excluding everything on the border) for each example image shown.
+            </p>
+            <div class="image-grid">
+            <figure>
+                <img src="media_updated/haven_2000_points.jpg" alt="Sample Image 1">
+            </figure>
+            </div>
+            <div class="image-grid">
+            <figure>
+                <img src="media_updated/soccer_2000_points.jpg" alt="Sample Image 1">
+            </figure>
+            </div>
+        </div>
+        <div class="section">
+            <h2 class="section-title">Adaptive Non-Maximal Suppression (ANMS)</h2>
+            <p>
+                Since we want the distribution of our points to end up being roughly uniform (to ensure stable homographies), we employ
+                a technique known as Adaptive Non-Maximal Suppression (ANMS) on the detected Harris corner interest points. For each point,
+                calculate a suppression radius according to the following:
+            </p>
+            <div class="image-grid">
+            <figure>
+                <img src="media_updated/anms.jpg" alt="Sample Image 1">
+            </figure>
+            </div>
+            <p>
+                To get N interest points, we choose the N interest points with the largest suppression radii. Doing this process yields the
+                following distribution of points.
+            </p>
+            <div class="image-grid">
+            <figure>
+                <img src="media_updated/etch_anms_points.jpg" alt="Sample Image 1">
+            </figure>
+            </div>
+            <div class="image-grid">
+            <figure>
+                <img src="media_updated/haven_anms_points.jpg" alt="Sample Image 1">
+            </figure>
+            </div>
+            <div class="image-grid">
+            <figure>
+                <img src="media_updated/studyroom_anms_points.jpg" alt="Sample Image 1">
+            </figure>
+            </div>
+        </div>
+        <div class="section">
+            <h2 class="section-title">Extracting feature descriptors</h2>
+            <p>
+                Now that we have a nice spread of interest points, we need to start matching them with other images. In order to do this,
+                we extract a feature descriptor from each point. This takes the form of an 8x8 patch downsampled from the 40x40 window around the
+                point, and normalized to have mean 0, variance 1. Some examples of extracted feature descriptors are shown below.
+            </p>
+            <div class="image-grid">
+            <figure>
+                <img src="media_updated/etch_feature_descriptors.jpg" alt="Sample Image 1">
+            </figure>
+            </div>
+        </div>
+        <div class="section">
+            <h2 class="section-title">Feature matching</h2>
+            <p>
+                In order to perform feature matching, we compare the euclidean distance between every feature descriptor with every other
+                feature descriptor. We accept the point corresponding to the closest feature descriptor if the ratio between the closest 
+                distance and second-closest distance is less than some threshold (0.4). This is to ensure that the best match is the best
+                match by a decent amount (the idea being that if there are multiple suitable matches, likely both are wrong since there
+                should only be one suitable match).
+
+                <br><br>
+
+                The results of running this feature matching process on the ANMS points is shown below, with corresponding points being
+                labeled the same color.
+            </p>
+            <div class="image-grid">
+            <figure>
+                <img src="media_updated/etch_feature_matched_points.jpg" alt="Sample Image 1">
+            </figure>
+            </div>
+            <div class="image-grid">
+            <figure>
+                <img src="media_updated/haven_feature_matched_points.jpg" alt="Sample Image 1">
+            </figure>
+            </div>
+            <div class="image-grid">
+            <figure>
+                <img src="media_updated/studyroom_feature_matched_points.jpg" alt="Sample Image 1">
+            </figure>
+            </div>
+        </div>
+        <div class="section">
+            <h2 class="section-title">4-point RANSAC</h2>
+            <p>
+                Now that we have a small set of candidate points, we can run 4-point RANSAC on these points to find a robust homography.
+                4-point RANSAC (Random sample consensus) is an algorithm where we randomly sample four points, compute the resulting 
+                homography, and count the number of inliers. We then choose the set with the most inliers and compute a homography from
+                that set. We define an inlier as a point that is sufficiently close to its corresponding point after being warped. This process
+                narrows down the set of matched features even more as it rejects most outliers and gives us a homography from points 
+                that it has already checked will end up close to their corresponding points after being warped. 
+
+                <br><br>
+
+                The following shows the resulting corresponding points after running 4-point RANSAC.
+            </p>
+            <div class="image-grid">
+            <figure>
+                <img src="media_updated/etch_ransac_points.jpg" alt="Sample Image 1">
+            </figure>
+            </div>
+            <div class="image-grid">
+            <figure>
+                <img src="media_updated/haven_ransac_points.jpg" alt="Sample Image 1">
+            </figure>
+            </div>
+            <div class="image-grid">
+            <figure>
+                <img src="media_updated/studyroom_ransac_points.jpg" alt="Sample Image 1">
+            </figure>
+            </div>
+        </div>
+        <div class="section">
+            <h2 class="section-title">Putting it all together</h2>
+            <p>
+                We now have all of the tools to perform fully automatic image stitching. The following mosaics were made from 2, 3, or 4 images, and were created without any human
+                input besides the capturing of the images. The correspondence points used to generate the homographies were fully automatically 
+                generated and the stitching and blending process were also fully automated.
+            </p>
+            <div class="image-grid">
+            <figure>
+                <img src="media_updated/auto/auto_etch_mosaic.jpg" alt="Sample Image 1">
+            </figure>
+            </div>
+            <br>
+            <div class="image-grid">
+            <figure>
+                <img src="media_updated/auto/auto_haven_mosaic.jpg" alt="Sample Image 1">
+            </figure>
+            </div>
+            <br>
+            <div class="image-grid">
+            <figure>
+                <img src="media_updated/auto/auto_studyroom_mosaic.jpg" alt="Sample Image 1">
+            </figure>
+            </div>
+            <br>
+            <div class="image-grid">
+            <figure>
+                <img src="media_updated/auto/auto_soccer_mosaic.jpg" alt="Sample Image 1">
+            </figure>
+            </div>
+            <br>
+            <div class="image-grid">
+            <figure>
+                <img src="media_updated/auto/auto_room_mosaic.jpg" alt="Sample Image 1">
+            </figure>
+            </div>
+            <br>
+            <div class="image-grid">
+            <figure>
+                <img src="media_updated/auto/auto_house_mosaic.jpg" alt="Sample Image 1">
+            </figure>
+            </div>
+            <br>
+            <div class="image-grid">
+            <figure>
+                <img src="media_updated/auto/auto_berkeley_mosaic.jpg" alt="Sample Image 1">
+            </figure>
+            </div>
+        </div>
+        <div class="section">
+            <h2 class="section-title">What I learned</h2>
+            <p>
+                This project was the culmination of a variety of topics covered so far, and reinforced my understanding in 
+                each part of the process of creating image mosaics. Of the many cool techniques used, I am most fond of the
+                ANMS technique for generating a more uniform distribution of points. I also found RANSAC very interesting as 
+                a way to robustify the homographies. Utilizing random sampling to check for outliers is an idea that seems 
+                applicable to many other domains. <br><br>
+            </p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

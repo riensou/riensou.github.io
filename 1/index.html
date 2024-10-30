@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project 1: Images of the Russian Empire</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+        a {
+            display: inline-block;
+            color: #007bff;
+            text-decoration: none;
+        }
+        code {
+            font-family: "Courier New", Courier, monospace;
+            background-color: #f4f4f9;
+            padding: 2px 5px;
+            border-radius: 4px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        h2 {
+            color: #555;
+            text-align: center;
+        }
+        h3 {
+            color: #333;
+            margin-top: 40px;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 10px;
+            text-align: center;
+        }
+        h4 {
+            color: #131313;
+            text-align: center;
+        }
+        p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        img {
+            display: block;
+            margin: 20px auto;
+            max-width: 100%;
+            height: auto;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px auto;
+            font-size: 16px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        th.green {
+            color: rgb(54, 215, 54);
+        }
+        th.red {
+            color: rgb(232, 57, 57);
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #ddd;
+        }
+        .image-gallery {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        .image-gallery div {
+            flex: 1;
+            margin: 0 10px;
+            text-align: center;
+        }
+        .image-gallery img {
+            max-width: 100%;
+            height: auto;
+        }
+        .image-gallery p {
+            margin-top: 10px;
+            text-align: center;
+        }
+        .custom-carousel-container {
+            position: relative;
+            max-width: 600px;
+            margin: auto;
+            overflow: hidden; /* Only show one image at a time */
+        }
+        .custom-carousel {
+            display: flex;
+            transition: transform 0.4s ease-in-out;
+        }
+        .custom-carousel div {
+            min-width: 100%;
+            box-sizing: border-box;
+        }
+        .custom-carousel img {
+            max-width: 100%; /* Ensure images fit within the container */
+            max-height: 400px; /* Set a reasonable max height for the images */
+            display: block;
+            margin: auto;
+        }
+        .custom-carousel p {
+            margin-top: 10px;
+            text-align: center;
+        }
+        .prev-btn, .next-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            z-index: 10; /* Ensure the buttons are on top of everything */
+        }
+        .prev-btn {
+            left: 10px;
+        }
+        .next-btn {
+            right: 10px;
+        }
+        .prev-btn.hidden, .next-btn.hidden {
+            visibility: hidden; /* Use visibility instead of display: none */
+        }
+        .carousel-dots {
+            text-align: center;
+            margin-top: 10px;
+        }
+        .carousel-dots span {
+            height: 12px;
+            width: 12px;
+            margin: 0 5px;
+            background-color: #bbb;
+            border-radius: 50%;
+            display: inline-block;
+            cursor: pointer;
+        }
+        .carousel-dots .dot.active {
+            background-color: #717171; /* Active dot color */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CS 180 Project 1: Images of the Russian Empire</h1>
+        <h2>Ryan Campbell</h2>
+        <img src="./media/self_portrait.jpg" alt="self_portrait">
+
+        <h3>Introduction</h3>
+        <p>
+            Between 1909 and 1915, <a href="https://en.wikipedia.org/wiki/Sergey_Prokudin-Gorsky">Sergey Mikhaylovich Prokudin-Gorsky</a> 
+            travelled across the Russian Empire and documented a variety of things through photography. Interestingly, despite this being 
+            well before the time of widespread color photography, his records give us a colorful insight into the Russian Empire. This is 
+            because he was ingenious enough to capture three exposures of every photo, using a red, green, and blue filter.
+
+            <br> <br>
+
+            Now, his photographs have been digitized by the Library of Congress. Each image is a vertical stack of the individual images 
+            captured by the blue, green, and red filters.
+        </p>
+
+        <div class="image-gallery">
+            <div>
+                <a href="./media/original_self_portrait.jpeg" target="_blank">
+                    <img src="./media/original_self_portrait.jpeg" alt="original_self_portrait" width="100%">
+                </a>
+            </div>
+        </div>
+
+        <p>
+            Using image processing techniques, one can convert the stacked images shown above into colorful photographs
+            showcasing the beauty of the Russian Empire in the early 20th century. 
+        </p>
+
+        <h3>Single-scale Alignment</h3>
+        <p>
+            First, I split the starting image into thirds (blue, green, and red). We take the approach of finding displacements for the green 
+            and red images and then placing them back on top of the blue image. In order to find the "optimal" displacements of the green and 
+            red images, we can choose a metric to score different displacements and then search over as many displacements as possible. 
+
+            <br>
+            <br>
+            
+            Some possible metrics include Euclidean Distance (L2 norm), Normalized Cross-Correlation (NCC), Structural Similarity 
+            Index Measure (SSIM), etc. For this project, we utilize SSIM as implemented in <a href="https://scikit-image.org/docs/stable/api/skimage.metrics.html#skimage.metrics.structural_similarity"> 
+            <code>skimage.metrics</code> </a>. Although this metric takes slightly longer to compute than the others, for the larger
+            images, I found this to have better results. Furthermore, I excluded the 5% outside border from the calculation because there is 
+            less correlation between the different channels on the borders.
+
+            <br>
+            <br>
+
+            Even on smaller images, it can take awhile to check every possible displacement. Thus, we must intelligently restrict our 
+            search space. Notice that some displacements can be ruled out without checking them, as it's likely that the optimal 
+            displacement is somewhat close to 0. This is because we assume that the blue, green, and red images are close to each 
+            other within a reasonable error. Thus, my algorithm checks a displacement range of [-15, 15] for each of green &Delta;x, green 
+            &Delta;y, red &Delta;x, and red &Delta;y.
+
+            <br>
+            <br>
+
+            Running this alignment procedure on the three smaller images yields the results shown below.
+        </p>
+
+        <div class="image-gallery">
+            <div>
+                <a href="./media/cathedral.jpg" target="_blank">
+                    <img src="./media/cathedral.jpg" alt="cathedral">
+                </a>
+                <p>
+                    cathedral.jpg  
+                    <br>
+                    &Delta; green: (5, 2)
+                    <br>
+                    &Delta; red: (12, 3)
+                    <br>
+                    runtime: 11.06s
+                </p>
+            </div>
+            <div>
+                <a href="./media/monastery.jpg" target="_blank">
+                    <img src="./media/monastery.jpg" alt="monastery">
+                </a>
+                <p>
+                    monastery.jpg  
+                    <br>
+                    &Delta; green: (-3, 2)
+                    <br>
+                    &Delta; red: (3, 2)
+                    <br>
+                    runtime: 11.19s
+                </p>
+            </div>
+            <div>
+                <a href="./media/tobolsk.jpg" target="_blank">
+                    <img src="./media/tobolsk.jpg" alt="tobolsk">
+                </a>
+                <p>
+                    tobolsk.jpg  
+                    <br>
+                    &Delta; green: (3, 3)
+                    <br>
+                    &Delta; red: (6, 3)
+                    <br>
+                    runtime: 11.09s
+                </p>
+            </div>
+        </div>
+
+        <h3>Multiscale Alignment</h3>
+        <p>
+            For images of a larger scale, the approach described above is infeasible as (1) the scale is larger, so more displacements
+            need to be checked since each pixel is less noticeable and (2) calculating the metric takes longer for each check. Luckily,
+            there is a way to vastly reduce the search space and still maintain a high quality output.
+
+            <br>
+            <br>
+
+            The following is the idea. Recursively scale down the image by a factor of two until a 'small-enough' size is achieved. Then,
+            use the procedure from before to quickly find the 'optimal' displacement of this smaller image. Then, scaling this image up along 
+            with the calculated displacement yields a close approximation of the 'optimal' displacement for the higher quality image. Repeat
+            this process until the image returns to its original size.
+
+            <br>
+            <br>
+
+            My algorithm calculates the 'small-enough' size by finding the depth such that smallest side of the image is roughly 100 pixels.
+            Then, it checks a range of [-3, 3] for each displacement. After finding the 'optimal' displacement, I rescale up the current
+            image and the current optimal displacement by a factor of 2. I repeat this process until I return to my original image, where
+            I have to calculate very few displacements since my approximation should already be very close.
+
+            <br>
+            <br>
+
+            Running this multiscale alignment procedure on the larger images yields the results shown below (in a much faster time than it
+            would take with the single-scale alignment procedure).
+        </p>
+
+        <div class="image-gallery">
+            <div>
+                <a href="./media/church.jpg" target="_blank">
+                    <img src="./media/church.jpg" alt="church">
+                </a>
+                <p>
+                    church.tif
+                    <br>
+                    &Delta; green: (25, 4)
+                    <br>
+                    &Delta; red: (59, -4)
+                    <br>
+                    runtime: 107.29s
+                </p>
+            </div>
+            <div>
+                <a href="./media/emir.jpg" target="_blank">
+                    <img src="./media/emir.jpg" alt="emir">
+                </a>
+                <p>
+                    emir.tif
+                    <br>
+                    &Delta; green: (50, 22)
+                    <br>
+                    &Delta; red: (105, 40)
+                    <br>
+                    runtime: 110.21s
+                </p>
+            </div>
+            <div>
+                <a href="./media/harvesters.jpg" target="_blank">
+                    <img src="./media/harvesters.jpg" alt="harvesters">
+                </a>
+                <p>
+                    harvesters.tif  
+                    <br>
+                    &Delta; green: (59, 15)
+                    <br>
+                    &Delta; red: (122, 12)
+                    <br>
+                    runtime: 118.93s
+                </p>
+            </div>
+        </div>
+
+        <div class="image-gallery">
+            <div>
+                <a href="./media/icon.jpg" target="_blank">
+                    <img src="./media/icon.jpg" alt="icon">
+                </a>
+                <p>
+                    icon.tif  
+                    <br>
+                    &Delta; green: (39, 16)
+                    <br>
+                    &Delta; red: (89, 23)
+                    <br>
+                    runtime: 124.10s
+                </p>
+            </div>
+            <div>
+                <a href="./media/lady.jpg" target="_blank">
+                    <img src="./media/lady.jpg" alt="lady">
+                </a>
+                <p>
+                    lady.tif  
+                    <br>
+                    &Delta; green: (57, 8)
+                    <br>
+                    &Delta; red: (120, 12)
+                    <br>
+                    runtime: 133.33s
+                </p>
+            </div>
+            <div>
+                <a href="./media/melons.jpg" target="_blank">
+                    <img src="./media/melons.jpg" alt="melons">
+                </a>
+                <p>
+                    melons.tif 
+                    <br>
+                    &Delta; green: (80, 10)
+                    <br>
+                    &Delta; red: (177, 13)
+                    <br>
+                    runtime: 112.90s
+                </p>
+            </div>
+        </div>
+
+        <div class="image-gallery">
+            <div>
+                <a href="./media/onion_church.jpg" target="_blank">
+                    <img src="./media/onion_church.jpg" alt="onion_church">
+                </a>
+                <p>
+                    onion_church.tif  
+                    <br>
+                    &Delta; green: (52, 25)
+                    <br>
+                    &Delta; red: (108, 35)
+                    <br>
+                    runtime: 123.56s
+                </p>
+            </div>
+            <div>
+                <a href="./media/sculpture.jpg" target="_blank">
+                    <img src="./media/sculpture.jpg" alt="sculpture">
+                </a>
+                <p>
+                    sculpture.tif
+                    <br>
+                    &Delta; green: (33, -11)
+                    <br>
+                    &Delta; red: (140, -27)
+                    <br>
+                    runtime: 140.27s
+                </p>
+            </div>
+            <div>
+                <a href="./media/self_portrait.jpg" target="_blank">
+                    <img src="./media/self_portrait.jpg" alt="self_portrait">
+                </a>
+                <p>
+                    self_portrait.tif  
+                    <br>
+                    &Delta; green: (78, 28)
+                    <br>
+                    &Delta; red: (175, 37)
+                    <br>
+                    runtime: 159.43s
+                </p>
+            </div>
+        </div>
+
+        <div class="image-gallery">
+            <div>
+                <a href="./media/three_generations.jpg" target="_blank">
+                    <img src="./media/three_generations.jpg" alt="three_generations">
+                </a>
+                <p>
+                    three_generations.tif 
+                    <br>
+                    &Delta; green: (56, 17)
+                    <br>
+                    &Delta; red: (113, 10)
+                    <br>
+                    runtime: 111.33s
+                </p>
+            </div>
+            <div>
+                <a href="./media/train.jpg" target="_blank">
+                    <img src="./media/train.jpg" alt="train">
+                </a>
+                <p>
+                    train.tif 
+                    <br>
+                    &Delta; green: (40, 7)
+                    <br>
+                    &Delta; red: (85, 29)
+                    <br>
+                    runtime: 134.13s
+                </p>
+            </div>
+        </div>
+
+        <h3>Table of Displacements</h3>
+        <table>
+            <tr>
+                <th>filename</th>
+                <th>method</th>
+                <th class="green">green dx</th>
+                <th class="green">green dy</th>
+                <th class="red">red dx</th>
+                <th class="red">red dy</th>
+                <th>time</th>
+            </tr>
+            <tr><td>cathedral.jpg</td><td>single-scale</td><td>5</td><td>2</td><td>12</td><td>3</td><td>11.06</td></tr>
+            <tr><td>monastery.jpg</td><td>single-scale</td><td>-3</td><td>2</td><td>3</td><td>2</td><td>11.19</td></tr>
+            <tr><td>tobolsk.jpg</td><td>single-scale</td><td>3</td><td>3</td><td>6</td><td>3</td><td>11.09</td></tr>
+            <tr><td>church.tif</td><td>multiscale</td><td>25</td><td>4</td><td>59</td><td>-4</td><td>107.29</td></tr>
+            <tr><td>emir.tif</td><td>multiscale</td><td>50</td><td>22</td><td>105</td><td>40</td><td>110.21</td></tr>
+            <tr><td>harvesters.tif</td><td>multiscale</td><td>59</td><td>15</td><td>122</td><td>12</td><td>118.93</td></tr>
+            <tr><td>icon.tif</td><td>multiscale</td><td>39</td><td>16</td><td>89</td><td>23</td><td>124.10</td></tr>
+            <tr><td>lady.tif</td><td>multiscale</td><td>57</td><td>8</td><td>120</td><td>12</td><td>133.33</td></tr>
+            <tr><td>melons.tif</td><td>multiscale</td><td>80</td><td>10</td><td>177</td><td>13</td><td>112.90</td></tr>
+            <tr><td>onion_church.tif</td><td>multiscale</td><td>52</td><td>25</td><td>108</td><td>35</td><td>123.56</td></tr>
+            <tr><td>sculpture.tif</td><td>multiscale</td><td>33</td><td>-11</td><td>140</td><td>-27</td><td>140.27</td></tr>
+            <tr><td>self_portrait.tif</td><td>multiscale</td><td>78</td><td>28</td><td>175</td><td>37</td><td>159.43</td></tr>
+            <tr><td>three_generations.tif</td><td>multiscale</td><td>56</td><td>17</td><td>113</td><td>10</td><td>111.33</td></tr>
+            <tr><td>train.tif</td><td>multiscale</td><td>40</td><td>7</td><td>85</td><td>29</td><td>134.13</td></tr>
+        </table>
+
+        <h3>Bells and Whistles</h3>
+        <p>
+            Notice that after the alignment process is complete, each image is left with some borders. As these
+            borders are not the same for each image, some custom border-cropping procedure is needed to clean
+            up the photos (rather than setting a default crop). Thus, I devised the following procedure to automatically
+            crop the aligned photos:
+            
+            <br>
+            <br>
+
+            First, use the calculated 'optimal' displacement to make the obvious cuts. For example, if the red channel is shifted to 
+            the right by 20 pixels, then clearly the leftmost 20 pixels of the overall image can be safely cut as the lack of red
+            will at the very least create an artificial border (if there isn't already a border there). Since the blue channel stays fixed,
+            any displacement of the green and red channels gives us some safe cuts to make, as we won't want any parts of our picture to
+            not contain all three color channels.
+
+            <br>
+            <br>
+
+            Second, convert the initial crop to grayscale in the following ways: (1) using all color channels along with the weights for each 
+            channel specified by <a href="https://scikit-image.org/docs/stable/api/skimage.color.html#skimage.color.rgb2gray">
+            <code>skimage.color.rgb2array</code> </a>, (2) dropping the red channel, (3) dropping the green channel, and (4) 
+            dropping the blue channel. The reason for dropping channels is we want to be able to detect color edges beyond just black and white,
+            and this is harder to do if we only use a singular gray image.
+
+            <br>
+            <br>
+
+            Third, run <a href="https://ieeexplore.ieee.org/document/4767851"> Canny edge detection </a> on each grayscale image to get an approximation of the edges present in the image. I used the 
+            <a href="https://scikit-image.org/docs/0.21.x/api/skimage.feature.html#skimage.feature.canny">
+            <code>skimage.feature.canny</code> </a> implementation, with &sigma;=3 and default values for everything else. Without runniny Canny edge 
+            detection, the results of the next step were too unpredictable and uncontrolled.
+
+            <br>
+            <br>
+
+            Fourth, run <a href="https://ieeexplore.ieee.org/document/786993">probabilistic Hough transform</a> on the edges from the previous step, checking for 
+            vertical and horizontal lines. I used the <a href="https://scikit-image.org/docs/stable/api/skimage.transform.html#skimage.transform.probabilistic_hough_line">
+            <code>skimage.transform.probabilistic_hough_line</code></a> implementation, with threshold=5, line_length=200, line_gap=50 for the horizontal
+            line check and threshold=50, line_length=300, line_gap=25 for the vertical line check. I made the constraints harder on the vertical lines because
+            I found my algorithm struggling more with cropping horizontally than vertically.
+
+            <br>
+            <br>
+
+            Finally, use the detected lines (all of them from each of the four grayscale images) on the outer 10% of the image to make the final crop. 
+            Following this process yielded the following results:
+
+            <div class="custom-carousel-container">
+                <button class="prev-btn hidden" onclick="prevImage()">&#10094;</button>
+                <div class="custom-carousel">
+                    <div>
+                        <a href="./media/emir_crop_work.jpeg" target="_blank">
+                            <img src="./media/emir_crop_work.jpeg" alt="emir crop work">
+                        </a>
+                        <p>The cropping process for emir.tif</p>
+                    </div>
+                    <div>
+                        <a href="./media/cropped_emir.jpg" target="_blank">
+                            <img src="./media/cropped_emir.jpg" alt="cropped emir">
+                        </a>
+                        <p>The final crop of emir.tif</p>
+                    </div>
+                    <div>
+                        <a href="./media/icon_crop_work.jpeg" target="_blank">
+                            <img src="./media/icon_crop_work.jpeg" alt="icon crop work">
+                        </a>
+                        <p>The cropping process for icon.tif</p>
+                    </div>
+                    <div>
+                        <a href="./media/cropped_icon.jpg" target="_blank">
+                            <img src="./media/cropped_icon.jpg" alt="cropped icon">
+                        </a>
+                        <p>The final crop of icon.tif</p>
+                    </div>
+                    <div>
+                        <a href="./media/melons_crop_work.jpeg" target="_blank">
+                            <img src="./media/melons_crop_work.jpeg" alt="melons crop work">
+                        </a>
+                        <p>The cropping process for melons.tif</p>
+                    </div>
+                    <div>
+                        <a href="./media/cropped_melons.jpg" target="_blank">
+                            <img src="./media/cropped_melons.jpg" alt="cropped melons">
+                        </a>
+                        <p>The final crop of melons.tif</p>
+                    </div>
+                    <div>
+                        <a href="./media/self_portrait_crop_work.jpeg" target="_blank">
+                            <img src="./media/self_portrait_crop_work.jpeg" alt="self_portrait crop work">
+                        </a>
+                        <p>The cropping process for self_portrait.tif</p>
+                    </div>
+                    <div>
+                        <a href="./media/cropped_self_portrait.jpg" target="_blank">
+                            <img src="./media/cropped_self_portrait.jpg" alt="cropped self_portrait">
+                        </a>
+                        <p>The final crop of self_portrait.tif</p>
+                    </div>
+                </div>
+                <button class="next-btn" onclick="nextImage()">&#10095;</button>
+            </div>
+            
+            <!-- Dots for 8 Images -->
+            <div class="carousel-dots" id="dots-carousel1">
+                <span class="dot active" onclick="showImage(0)"></span>
+                <span class="dot" onclick="showImage(1)"></span>
+                <span class="dot" onclick="showImage(2)"></span>
+                <span class="dot" onclick="showImage(3)"></span>
+                <span class="dot" onclick="showImage(4)"></span>
+                <span class="dot" onclick="showImage(5)"></span>
+                <span class="dot" onclick="showImage(6)"></span>
+                <span class="dot" onclick="showImage(7)"></span>
+            </div>
+        </p>
+
+        <br>
+
+        <p>
+            All black and white borders were successfully cropped. Some remnants or partial color borders remained, so my 
+            algorithm has room for improvement there. Originally, when I only used the full grayscale image, my algorithm did
+            even worse with the partial color borders, but including the grayscale images with each of the channels removed
+            improved my results significantly.
+        </p>
+    </div>
+
+<script>
+    let currentImageIndex = 0;
+
+    function showImage(index) {
+        const gallery = document.querySelector('.custom-carousel');
+        const dots = document.querySelectorAll('.dot');
+        const totalImages = document.querySelectorAll('.custom-carousel div').length;
+        const prevBtn = document.querySelector('.prev-btn');
+        const nextBtn = document.querySelector('.next-btn');
+
+        // Ensure index is within bounds
+        if (index >= totalImages) {
+            currentImageIndex = 0;
+        } else if (index < 0) {
+            currentImageIndex = totalImages - 1;
+        } else {
+            currentImageIndex = index;
+        }
+
+        // Move the gallery to the selected image
+        gallery.style.transform = `translateX(-${currentImageIndex * 100}%)`;
+
+        // Update the dots
+        dots.forEach(dot => dot.classList.remove('active'));
+        dots[currentImageIndex].classList.add('active');
+
+        // Control visibility of prev and next buttons
+        prevBtn.style.visibility = currentImageIndex === 0 ? 'hidden' : 'visible';
+        nextBtn.style.visibility = currentImageIndex === totalImages - 1 ? 'hidden' : 'visible';
+    }
+
+    function nextImage() {
+        showImage(currentImageIndex + 1);
+    }
+
+    function prevImage() {
+        showImage(currentImageIndex - 1);
+    }
+
+    // Initialize by showing the first image
+    showImage(0);
+</script>
+
+</body>
+</html>

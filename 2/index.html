@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS 180 Project 2: Fun with Filters and Frequencies!</title>
+    <style>
+        body {
+            background-color: #ffe6e6; /* Light red for the sides */
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px; /* Adjust the width of your content */
+            margin: 0 auto; /* Center the content */
+            text-align: center;
+        }
+        header {
+            background-color: #990000; /* Darker red for the header */
+            padding: 20px;
+            color: #ffffff; /* White text for the header */
+            text-align: center;
+        }
+        h1 {
+            margin: 0;
+        }
+        h2, h3 {
+            color: #000000; /* Black for headings */
+        }
+        .section {
+            text-align: left; /* Align section content to the left */
+            margin-bottom: 30px;
+            padding: 0 20px; /* Add some padding for better spacing */
+        }
+        .section-title {
+            text-align: center; /* Center-align the section title */
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+        .image-grid {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .image-grid figure {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+        }
+        .image-grid img {
+            max-width: 200px;
+            max-height: 200px;
+            object-fit: contain;
+        }
+        .image-grid figcaption {
+            margin-top: 5px;
+            font-size: 0.9em;
+            color: #555; /* Light gray for the caption text */
+            text-align: center;
+            margin-left: 5px; /* Increase left margin */
+            margin-right: 5px; /* Increase right margin */
+        }
+        .section-title {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<header>
+    <h1>CS 180 Project 2: Fun with Filters and Frequencies!</h1>
+    <br>
+    Ryan Campbell
+</header>
+<body>
+    <div class="container">
+
+    <div class="section">
+        <h2 class="section-title">Part 1.1: Finite Difference Operator</h2>
+        <p>
+            Starting with the cameraman image, we explore the capabilities of the finite difference operator. We define
+            two filters D_x = [1, -1] and D_y = [1, -1]^T and convolve them with the cameraman image.
+        </p>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part1.1/cameraman.jpg" alt="Image 1">
+                <figcaption>original cameraman image</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part1.1/cameramandx.jpg" alt="Image 2">
+                <figcaption>cameraman convolved with D_x <br> (cameraman_x)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part1.1/cameramandy.jpg" alt="Image 2">
+                <figcaption>cameraman convolved with D_y <br> (cameraman_y)</figcaption>
+            </figure>
+        </div>
+        <p>
+            Next, we compute the gradient magnitude image by computing ((cameraman_x)+(cameraman_y))^0.5. In order to
+            binarize this image, we set choose a threshold and set all values above it to be 1 and below it to be 0.
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part1.1/cameramangradientmagnitude.jpg" alt="Image 1">
+                    <figcaption>gradient magnitude image of cameraman</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part1.1/cameramanedges_thres0.1.jpg" alt="Image 2">
+                    <figcaption>gradient magnitude image with threshold=0.1</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part1.1/cameramanedges_thres0.3.jpg" alt="Image 2">
+                    <figcaption>gradient magnitude image with threshold=0.3</figcaption>
+                </figure>
+            </div>
+        </p>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Part 1.2: Derivative of Gaussian (DoG) Filter</h2>
+        <p>
+            As the previous results are noisy, we utilize a smoothing operator to reduce this noise. In particular,
+            we use a Gaussian filter, G. This creates a blurred version of the cameraman image by convolving with a
+            Gaussian (low-pass filter). Thus, we repeat the process described above, starting with a blurred version of
+            the cameraman image.
+        </p>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part1.2/cameramanblurred.jpg" alt="Image 1">
+                <figcaption>blurred cameraman image</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part1.2/cameramanblurred_D_x.jpg" alt="Image 2">
+                <figcaption>blurred cameraman image convolved with D_x</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part1.2/cameramanblurred_D_y.jpg" alt="Image 2">
+                <figcaption>blurred cameraman image convolved with D_y</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part1.2/cameramanblurredgradientmagnitude.jpg" alt="Image 2">
+                <figcaption>gradient magnitude image with threshold=0.1</figcaption>
+            </figure>
+        </div>
+        <p>
+            Notice that here we are having to do four convolutions on the cameraman image (two for calculating the 
+            blurred convolution with D_x and two for calculating the blurred convolution with D_y). However, recall 
+            that convolution is a commutative operation. Thus, it should be able to reduce the number of 
+            convolutions we perform by half. That is, perform the first convolution between the D_x/D_y filter with
+            G to get a Derivative of Gaussian filter (DoG). This is preferable because it is less expensive than 
+            performing multiple convolutions on the larger cameraman image.
+        </p>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part1.2/godx_filter.jpg" alt="Image 1" width="300" height="300">
+                <figcaption>D_x convolved with G <br> (DoG_x)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part1.2/gody_filter.jpg" alt="Image 2" width="300" height="300">
+                <figcaption>D_y convolved with G <br> (DoG_y)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part1.2/cameramanblurred_D_x_filter.jpg" alt="Image 2">
+                <figcaption>cameraman image convoled with DoG_x</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part1.2/cameramanblurred_D_y_filter.jpg" alt="Image 2">
+                <figcaption>cameraman image convoled with DoG_x</figcaption>
+            </figure>
+        </div>
+        <p>
+            Now we should see (and we do) that the gradient magnitude image is identical when comparing between the approach
+            with separated convolutions and the approach that utilizes the DoG filters. Note that any small differences come
+            from small padding errors (convolution does not normally preserve the size of an image), but these errors are 
+            negligble.
+        </p>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part1.2/cameramanblurredgradientmagnitude.jpg" alt="Image 2">
+                <figcaption>gradient magnitude image with threshold=0.1 <br> (4 convolutions on cameraman)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part1.2/cameramanblurredgradientmagnitude_filter.jpg    " alt="Image 2">
+                <figcaption>gradient magnitude image with threshold=0.1 <br> (2 convolutions on cameraman by utilizing DoG filters)</figcaption>
+            </figure>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Part 2.1: Image "Sharpening"</h2>
+        <p>
+            Recall that the Gaussian filter G is a low-pass filter. In order to create a high-pass filter, we subtract the blurred
+            version of the image (which contains the low frequencies) from the original image (which contains all frequencies),
+            granting us an image with only high frequencies. 
+
+            <br>
+            <br>
+
+            We can utilize the linearity of convolution to make this process into a single convolution filter, 
+            called the unsharp mask filter. We get this filter F by selecting some parameter alpha and then computing 
+            (1 + alpha) * I - alpha * G, where I denotes the unit impulse filter and '*' denotes scalar-filter 
+            multiplication, not convolution. Using this filter F yields the following results:
+        </p>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.1/taj.jpg" alt="Image 1">
+                <figcaption>original Taj Mahal image</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.1/sharpenedtaj_alpha=1.jpg" alt="Image 2">
+                <figcaption>sharpened Taj Mahal <br> (alpha=1)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.1/sharpenedtaj_alpha=2.jpg" alt="Image 2">
+                <figcaption>sharpened Taj Mahal <br> (alpha=2)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.1/sharpenedtaj_alpha=4.jpg" alt="Image 2">
+                <figcaption>sharpened Taj Mahal <br> (alpha=4)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.1/sharpenedtaj_alpha=8.jpg" alt="Image 2">
+                <figcaption>sharpened Taj Mahal <br> (alpha=8)</figcaption>
+            </figure>
+        </div>
+        <p>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.1/guitar.JPG" alt="Image 1">
+                <figcaption>original guitar image</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.1/sharpenedguitar_alpha=1.jpg" alt="Image 2" class="rotate-image">
+                <figcaption>sharpened guitar <br> (alpha=1)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.1/sharpenedguitar_alpha=2.jpg" alt="Image 2">
+                <figcaption>sharpened guitar <br> (alpha=2)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.1/sharpenedguitar_alpha=4.jpg" alt="Image 2">
+                <figcaption>sharpened guitar <br> (alpha=4)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.1/sharpenedguitar_alpha=8.jpg" alt="Image 2">
+                <figcaption>sharpened guitar <br> (alpha=8)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.1/sharpenedguitar_alpha=16.jpg" alt="Image 2">
+                <figcaption>sharpened guitar <br> (alpha=16)</figcaption>
+            </figure>
+        </div>
+        <br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.1/pianopov.JPG" alt="Image 1">
+                <figcaption>original piano image</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.1/sharpenedpianopov_alpha=1.jpg" alt="Image 2" class="rotate-image">
+                <figcaption>sharpened piano <br> (alpha=1)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.1/sharpenedpianopov_alpha=2.jpg" alt="Image 2">
+                <figcaption>sharpened piano <br> (alpha=2)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.1/sharpenedpianopov_alpha=4.jpg" alt="Image 2">
+                <figcaption>sharpened piano <br> (alpha=4)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.1/sharpenedpianopov_alpha=8.jpg" alt="Image 2">
+                <figcaption>sharpened piano <br> (alpha=8)</figcaption>
+            </figure>
+        </div>
+        <p>
+            Furthermore, we can attempt to 'regain' clarity from a blurred image by doing this process. That is, if we blur an
+            image, we can attempt to 'unblur' it by sharpening it. Note that this doesn't recover the high frequencies that are
+            lost during the blurring process, but it does emphasize the ones that remain.
+        </p>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.1/blurredtaj.jpg" alt="Image 1">
+                <figcaption>blurred Taj Mahal image</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.1/sharpenedblurredtaj_alpha=1.jpg" alt="Image 2" class="rotate-image">
+                <figcaption>sharpened blurred Taj Mahal <br> (alpha=1)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.1/sharpenedblurredtaj_alpha=2.jpg" alt="Image 2">
+                <figcaption>sharpened blurred Taj Mahal <br> (alpha=2)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.1/sharpenedblurredtaj_alpha=4.jpg" alt="Image 2">
+                <figcaption>sharpened blurred Taj Mahal <br> (alpha=4)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.1/sharpenedblurredtaj_alpha=8.jpg" alt="Image 2">
+                <figcaption>sharpened blurred Taj Mahal <br> (alpha=8)</figcaption>
+            </figure>
+        </div>
+        <br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.1/blurredpiano.jpg" alt="Image 1">
+                <figcaption>blurred piano image</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.1/sharpenedblurredpiano_alpha=1.jpg" alt="Image 2" class="rotate-image">
+                <figcaption>sharpened blurred piano <br> (alpha=1)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.1/sharpenedblurredpiano_alpha=2.jpg" alt="Image 2">
+                <figcaption>sharpened blurred piano <br> (alpha=2)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.1/sharpenedblurredpiano_alpha=4.jpg" alt="Image 2">
+                <figcaption>sharpened blurred piano <br> (alpha=4)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.1/sharpenedblurredpiano_alpha=8.jpg" alt="Image 2">
+                <figcaption>sharpened blurred piano <br> (alpha=8)</figcaption>
+            </figure>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Part 2.2: Hybrid Images</h2>
+        <p>
+            Next, we seek to create hybrid images, images which appear to be one thing up close and another when further
+            away. This is done by exploiting the fact that the human eye percieves higher frequencies when up close and
+            lower frequencies when further away. Thus, in order to create a hybrid image, one can use a low-pass filter
+            on one image, a high-pass filter on another image, and then average them. Some examples of carrying out this
+            process are given below:
+        </p>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.2/DerekPicture.jpg" alt="Image 1">
+                <figcaption>man (unmodified picture)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.2/nutmeg.jpg" alt="Image 2">
+                <figcaption>cat (unmodified picture)</figcaption>
+            </figure>
+        </div>
+        <br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.2/mancat_low.jpg" alt="Image 2">
+                <figcaption>low-pass filter on cat</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.2/mancat_high.jpg" alt="Image 1">
+                <figcaption>high-pass filter on man</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.2/mancat_hybrid.jpg" alt="Image 2">
+                <figcaption>catman</figcaption>
+            </figure>
+        </div>
+        <br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.2/catman_low.jpg" alt="Image 2">
+                <figcaption>low-pass filter on man</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.2/catman_high.jpg" alt="Image 1">
+                <figcaption>high-pass filter on cat</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.2/catman_hybrid.jpg" alt="Image 2">
+                <figcaption>mancat</figcaption>
+            </figure>
+        </div>
+        <br>
+        <br>
+        <br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.2/benny1.jpg" alt="Image 1">
+                <figcaption>my dog, Benny (unmodified picture)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.2/franklin3.jpg" alt="Image 2">
+                <figcaption>my cat, Franklin (unmodified picture)</figcaption>
+            </figure>
+        </div>
+        <br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.2/b1f3_low.jpg" alt="Image 2">
+                <figcaption>low-pass filter on Benny</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.2/b1f3_high.jpg" alt="Image 1">
+                <figcaption>high-pass filter on Franklin</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.2/b1f3_hybrid.jpg" alt="Image 2">
+                <figcaption>Benlin</figcaption>
+            </figure>
+        </div>
+        <br><br><br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.2/benny2.jpg" alt="Image 1">
+                <figcaption>my dog, Benny (unmodified picture)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.2/franklin2.jpg" alt="Image 2">
+                <figcaption>my cat, Franklin (unmodified picture)</figcaption>
+            </figure>
+        </div>
+        <br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.2/b2f2_low.jpg" alt="Image 2">
+                <figcaption>low-pass filter on Franklin</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.2/b2f2_high.jpg" alt="Image 1">
+                <figcaption>high-pass filter on Benny</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.2/b2f2_hybrid.jpg" alt="Image 2">
+                <figcaption>Frenny</figcaption>
+            </figure>
+        </div>
+        <br>
+        <p>
+            Notice that the color works better for the low-frequency component, though it does work for both. This makes
+            intuitive sense, as the broad strokes of the hybrid image are determined by the low-frequency component, and 
+            thus its colors end up mattering more.
+        </p>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.2/banana.JPG" alt="Image 1">
+                <figcaption>a banana (unmodified picture)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.2/minions.jpg" alt="Image 2">
+                <figcaption>some Lego minions (unmodified picture)</figcaption>
+            </figure>
+        </div>
+        <br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.2/minion_banana_low.jpg" alt="Image 2">
+                <figcaption>low-pass filter on banana</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.2/minion_banana_high.jpg" alt="Image 1">
+                <figcaption>high-pass filter on minions</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.2/minion_banana_hybrid.jpg" alt="Image 2">
+                <figcaption>Bananaaaaaaaaaaa</figcaption>
+            </figure>
+        </div>
+        <br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.2/color_minion_banana_low.jpg" alt="Image 2">
+                <figcaption>low-pass filter on banana <br> (color) </figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.2/color_minion_banana_high.jpg" alt="Image 1">
+                <figcaption>high-pass filter on minions <br> (color) </figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.2/color_minion_banana_hybrid.jpg" alt="Image 2">
+                <figcaption>Bananaaaaaaaaaaa <br> (color) </figcaption>
+            </figure>
+        </div>
+        <br>
+        <p>
+            For the above result (my favorite of the hybrid images), we can visualize the processes using frequency 
+            analysis with the log magnitude of the Fourier transform of the two input images, the filtered images, 
+            and the hybrid image.
+        </p>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.2/mb1_fft.jpg" alt="Image 1">
+                <figcaption>banana <br> (log magnitude of the Fourier transform)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.2/mb2_fft.jpg" alt="Image 2">
+                <figcaption>minions <br> (log magnitude of the Fourier transform)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.2/low_mb_fft.jpg" alt="Image 1">
+                <figcaption>low-pass filter on banana  <br> (log magnitude of the Fourier transform)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.2/high_mb_fft.jpg" alt="Image 2">
+                <figcaption>high-pass filter on minions <br> (log magnitude of the Fourier transform)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.2/hybrid_mb_fft.jpg" alt="Image 2">
+                <figcaption>Bananaaaaaaaaaaa hybrid image <br> (log magnitude of the Fourier transform)</figcaption>
+            </figure>
+        </div>
+        <p>
+            Unfortunately, this process of making hybrid images does not always work. Sometimes, the images cannot be 
+            properly aligned, one of the images dominates too much, or both mess with each other so much that everything
+            becomes unintelligible. In the following example, the hybrid image fails because all of the words become 
+            illegible.
+        </p>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.2/trick_or_treat.jpeg" alt="Image 2">
+                <figcaption>a trick-or-treat sign (unmodified picture)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.2/live_laugh_love.jpg" alt="Image 1">
+                <figcaption>a live, laugh, love sign (unmodified picture)</figcaption>
+            </figure>
+        </div>
+        <br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.2/sign_low.jpg" alt="Image 2">
+                <figcaption>low-pass filter on trick-or-treat</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.2/sign_high.jpg" alt="Image 1">
+                <figcaption>high-pass filter on live, laugh, love</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.2/sign_hybrid.jpg" alt="Image 2">
+                <figcaption>Live, trick, laugh, love, or treat <br> (hybrid of the two signs)</figcaption>
+            </figure>
+        </div>
+        
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Part 2.3: Gaussian and Laplacian Stacks</h2>
+        <p>
+            Next, we move forward by investigating multiresolution blending. In order to accomplish this task, it will
+            be necessary to develop some machinery that can handle Gaussian and Laplacian stacks.
+
+            <br>
+            <br>
+
+            Gaussian stacks, G, are computed by taking an image and repeatedly applying a Gaussian filter onto it, placing an
+            unblurred image in the start of the stack, G_0. Laplacian stacks, L, are computed by taking a Gaussian stack, 
+            [G_0, G_1, ..., G_n], and calculating L_i by G_i - G_(i+1) for i=0,1,...,n-1, and setting L_n to G_n. Thus,
+            we note that L_0 + L_1 + ... + L_n is the original image.
+
+            <br>
+            <br>
+
+            The following are examples of Gaussian and Laplacian stacks, normalized for visualization purposes 
+            (with the first row being a Gaussian stack and the second row being a Laplacian stack):
+        </p>
+        <br><br><br><br><br><br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.3/apple_stacks.jpg" alt="Image 1" style="transform: scale(5); transform-origin: center;">
+                <figcaption></figcaption>
+            </figure>
+        </div>
+        <br><br><br><br><br><br><br><br><br><br><br><br><br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.3/orange_stacks.jpg" alt="Image 2" style="transform: scale(5); transform-origin: center;">
+                <figcaption></figcaption>
+            </figure>
+        </div>
+        <br><br><br><br><br><br><br>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Part 2.4: Multiresolution Blending (a.k.a. the oraple!)</h2>
+        <p>
+            Now that we can create Gaussian and Laplacian stacks, we are ready to create multiresolution blended images. 
+            We define blend_i = mGi * ALi + (1 - mGi) * BLi where mGi is the ith element of the Gaussian stack of the mask, 
+            ALi is the ith element of the Laplacian stack of image A, and BLi is the ith element of the Laplacian stack of
+            image B. To get the final blended image, we sum up each of the blend_i. Note that all of the following 
+            images are once again normalized for visualization purposes.
+        </p>
+        <br><br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.4/orapple/apple0.jpg" alt="Image 1" width="100" height="100">
+                <figcaption>apple L_0 (aL0)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/orapple/orange0.jpg" alt="Image 2" width="100" height="100">
+                <figcaption>orange L_0 (oL0)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/orapple/mask1.jpg" alt="Image 2" width="100" height="100">
+                <figcaption>mask G_0 (mG0)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/orapple/level0.jpg" alt="Image 2" width="100" height="100">
+                <figcaption>blend_0 (mG0 * aL0 + (1 - mG0) * oL0)</figcaption>
+            </figure>
+        </div>
+        <br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.4/orapple/apple1.jpg" alt="Image 1" width="100" height="100">
+                <figcaption>apple L_1 (aL1)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/orapple/orange1.jpg" alt="Image 2" width="100" height="100">
+                <figcaption>orange L_1 (oL1)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/orapple/mask2.jpg" alt="Image 2" width="100" height="100">
+                <figcaption>mask G_1 (mG1)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/orapple/level1.jpg" alt="Image 2" width="100" height="100">
+                <figcaption>blend_1 (mG1 * aL1 + (1 - mG1) * oL1)</figcaption>
+            </figure>
+        </div>
+        <br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.4/orapple/apple2.jpg" alt="Image 1" width="100" height="100">
+                <figcaption>apple L_2 (aL2)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/orapple/orange2.jpg" alt="Image 2" width="100" height="100">
+                <figcaption>orange L_2 (oL2)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/orapple/mask3.jpg" alt="Image 2" width="100" height="100">
+                <figcaption>mask G_2 (mG2)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/orapple/level2.jpg" alt="Image 2" width="100" height="100">
+                <figcaption>blend_2 (mG2 * aL2 + (1 - mG2) * oL2)</figcaption>
+            </figure>
+        </div>
+        <br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.4/orapple/apple3.jpg" alt="Image 1" width="100" height="100">
+                <figcaption>apple L_3 (aL3)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/orapple/orange3.jpg" alt="Image 2" width="100" height="100">
+                <figcaption>orange L_3 (oL3)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/orapple/mask4.jpg" alt="Image 2" width="100" height="100">
+                <figcaption>mask G_3 (mG3)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/orapple/level3.jpg" alt="Image 2" width="100" height="100">
+                <figcaption>blend_3 (mG3 * aL3 + (1 - mG3) * oL3)</figcaption>
+            </figure>
+        </div>
+        <br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.4/orapple/apple4.jpg" alt="Image 1" width="100" height="100">
+                <figcaption>apple L_4 (aL4)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/orapple/orange4.jpg" alt="Image 2" width="100" height="100">
+                <figcaption>orange L_4 (oL4)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/orapple/mask5.jpg" alt="Image 2" width="100" height="100">
+                <figcaption>mask G_4 (mG4)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/orapple/level4.jpg" alt="Image 2" width="100" height="100">
+                <figcaption>blend_4 (mG4 * aL4 + (1 - mG4) * oL4)</figcaption>
+            </figure>
+        </div>
+        <br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.4/orapple/apple5.jpg" alt="Image 1" width="100" height="100">
+                <figcaption>apple L_5 (aL5)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/orapple/orange5.jpg" alt="Image 2" width="100" height="100">
+                <figcaption>orange L_5 (oL5)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/orapple/mask6.jpg" alt="Image 2" width="100" height="100">
+                <figcaption>mask G_5 (mG5)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/orapple/level5.jpg" alt="Image 2" width="100" height="100">
+                <figcaption>blend_5 (mG5 * aL5 + (1 - mG5) * oL5)</figcaption>
+            </figure>
+        </div>
+        <br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.4/orapple/apple6.jpg" alt="Image 1" width="100" height="100">
+                <figcaption>apple L_6 (aL6)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/orapple/orange6.jpg" alt="Image 2" width="100" height="100">
+                <figcaption>orange L_6 (oL6)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/orapple/mask7.jpg" alt="Image 2" width="100" height="100">
+                <figcaption>mask G_6 (mG6)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/orapple/level6.jpg" alt="Image 2" width="100" height="100">
+                <figcaption>blend_6 (mG6 * aL6 + (1 - mG6) * oL6)</figcaption>
+            </figure>
+        </div>
+        <br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.4/orapple/orapple.jpg" alt="Image 1" width="100" height="100">
+                <figcaption>orapple</figcaption>
+            </figure>
+        </div>
+        <br><br><br><br><br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.4/space_beach/ocean0.jpg" alt="Image 1">
+                <figcaption>AL_0</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/space_beach/space0.jpg" alt="Image 2">
+                <figcaption>BL_0</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/space_beach/mask1.jpg" alt="Image 2">
+                <figcaption>mG0</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/space_beach/level0.jpg" alt="Image 2">
+                <figcaption>blend_0</figcaption>
+            </figure>
+        </div>
+        <br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.4/space_beach/ocean1.jpg" alt="Image 1">
+                <figcaption>AL_1</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/space_beach/space1.jpg" alt="Image 2">
+                <figcaption>BL_1</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/space_beach/mask2.jpg" alt="Image 2">
+                <figcaption>mG1</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/space_beach/level1.jpg" alt="Image 2">
+                <figcaption>blend_1</figcaption>
+            </figure>
+        </div>
+        <br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.4/space_beach/ocean2.jpg" alt="Image 1">
+                <figcaption>AL_2</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/space_beach/space2.jpg" alt="Image 2">
+                <figcaption>BL_2</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/space_beach/mask3.jpg" alt="Image 2">
+                <figcaption>mG2</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/space_beach/level2.jpg" alt="Image 2">
+                <figcaption>blend_2</figcaption>
+            </figure>
+        </div>
+        <br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.4/space_beach/ocean3.jpg" alt="Image 1">
+                <figcaption>AL_3</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/space_beach/space3.jpg" alt="Image 2">
+                <figcaption>BL_3</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/space_beach/mask4.jpg" alt="Image 2">
+                <figcaption>mG3</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/space_beach/level3.jpg" alt="Image 2">
+                <figcaption>blend_3</figcaption>
+            </figure>
+        </div>
+        <br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.4/space_beach/ocean4.jpg" alt="Image 1">
+                <figcaption>AL_4</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/space_beach/space4.jpg" alt="Image 2">
+                <figcaption>BL_4</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/space_beach/mask5.jpg" alt="Image 2">
+                <figcaption>mG4</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/space_beach/level4.jpg" alt="Image 2">
+                <figcaption>blend_4</figcaption>
+            </figure>
+        </div>
+        <br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.4/space_beach/ocean5.jpg" alt="Image 1">
+                <figcaption>AL_5</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/space_beach/space5.jpg" alt="Image 2">
+                <figcaption>BL_5</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/space_beach/mask6.jpg" alt="Image 2">
+                <figcaption>mG5</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/space_beach/level5.jpg" alt="Image 2">
+                <figcaption>blend_5</figcaption>
+            </figure>
+        </div>
+        <br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.4/space_beach/ocean6.jpg" alt="Image 1">
+                <figcaption>AL_6</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/space_beach/space6.jpg" alt="Image 2">
+                <figcaption>BL_6</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/space_beach/mask7.jpg" alt="Image 2">
+                <figcaption>mG6</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/space_beach/level6.jpg" alt="Image 2">
+                <figcaption>blend_6</figcaption>
+            </figure>
+        </div>
+        <br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.4/space_beach/ocean.jpg" alt="Image 1">
+                <figcaption>beach</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/space_beach/galaxy.jpeg" alt="Image 1">
+                <figcaption>the stars</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/space_beach/space_beach.jpg" alt="Image 1">
+                <figcaption>Beach among the stars</figcaption>
+            </figure>
+        </div>
+        <br><br><br><br><br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.4/fire_ryan/ryan0.jpg" alt="Image 1">
+                <figcaption>AL_0</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/fire_ryan/volcan0.jpg" alt="Image 2">
+                <figcaption>BL_0</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/fire_ryan/mask1.jpg" alt="Image 2">
+                <figcaption>mG0</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/fire_ryan/level0.jpg" alt="Image 2">
+                <figcaption>blend_6</figcaption>
+            </figure>
+        </div>
+        <br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.4/fire_ryan/ryan1.jpg" alt="Image 1">
+                <figcaption>AL_1</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/fire_ryan/volcan1.jpg" alt="Image 2">
+                <figcaption>BL_1</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/fire_ryan/mask2.jpg" alt="Image 2">
+                <figcaption>mG1</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/fire_ryan/level1.jpg" alt="Image 2">
+                <figcaption>blend_1</figcaption>
+            </figure>
+        </div>
+        <br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.4/fire_ryan/ryan2.jpg" alt="Image 1">
+                <figcaption>AL_2</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/fire_ryan/volcan2.jpg" alt="Image 2">
+                <figcaption>BL_2</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/fire_ryan/mask3.jpg" alt="Image 2">
+                <figcaption>mG2</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/fire_ryan/level2.jpg" alt="Image 2">
+                <figcaption>blend_2</figcaption>
+            </figure>
+        </div>
+        <br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.4/fire_ryan/ryan3.jpg" alt="Image 1">
+                <figcaption>AL_3</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/fire_ryan/volcan3.jpg" alt="Image 2">
+                <figcaption>BL_3</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/fire_ryan/mask4.jpg" alt="Image 2">
+                <figcaption>mG3</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/fire_ryan/level3.jpg" alt="Image 2">
+                <figcaption>blend_3</figcaption>
+            </figure>
+        </div>
+        <br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.4/fire_ryan/ryan4.jpg" alt="Image 1">
+                <figcaption>AL_4</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/fire_ryan/volcan4.jpg" alt="Image 2">
+                <figcaption>BL_4</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/fire_ryan/mask5.jpg" alt="Image 2">
+                <figcaption>mG4</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/fire_ryan/level4.jpg" alt="Image 2">
+                <figcaption>blend_4</figcaption>
+            </figure>
+        </div>
+        <br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.4/fire_ryan/ryan5.jpg" alt="Image 1">
+                <figcaption>AL_5</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/fire_ryan/volcan5.jpg" alt="Image 2">
+                <figcaption>BL_5</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/fire_ryan/mask6.jpg" alt="Image 2">
+                <figcaption>mG5</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/fire_ryan/level5.jpg" alt="Image 2">
+                <figcaption>blend_5</figcaption>
+            </figure>
+        </div>
+        <br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.4/fire_ryan/ryan6.jpg" alt="Image 1">
+                <figcaption>AL_6</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/fire_ryan/volcan6.jpg" alt="Image 2">
+                <figcaption>BL_6</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/fire_ryan/mask7.jpg" alt="Image 2">
+                <figcaption>mG6</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/fire_ryan/level6.jpg" alt="Image 2">
+                <figcaption>blend_6</figcaption>
+            </figure>
+        </div>
+        <br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.4/fire_ryan/ryan7.jpg" alt="Image 1">
+                <figcaption>AL_7</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/fire_ryan/volcan7.jpg" alt="Image 2">
+                <figcaption>BL_7</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/fire_ryan/mask7.jpg" alt="Image 2">
+                <figcaption>mG7</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/fire_ryan/level7.jpg" alt="Image 2">
+                <figcaption>blend_7</figcaption>
+            </figure>
+        </div>
+        <br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.4/fire_ryan/ryan8.jpg" alt="Image 1">
+                <figcaption>AL_8</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/fire_ryan/volcan8.jpg" alt="Image 2">
+                <figcaption>BL_8</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/fire_ryan/mask9.jpg" alt="Image 2">
+                <figcaption>mG8</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/fire_ryan/level8.jpg" alt="Image 2">
+                <figcaption>blend_8</figcaption>
+            </figure>
+        </div>
+        <br>
+        <div class="image-grid">
+            <figure>
+                <img src="media/part2.4/fire_ryan/ryan.jpeg" alt="Image 1">
+                <figcaption>Ryan (me!)</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/fire_ryan/volcano.jpg" alt="Image 1">
+                <figcaption>lava world</figcaption>
+            </figure>
+            <figure>
+                <img src="media/part2.4/fire_ryan/fire_ryan.jpg" alt="Image 1">
+                <figcaption>Is it just me or is it hot in here?</figcaption>
+            </figure>
+        </div>
+        <br><br>
+        Note that the irregular mask for the above process was created on my iPad by drawing over the initial photo of me.
+        I'm very pleased with how all of the blended images turned out. The multiresolution blending process produces
+        significantly better results than just simply stitching images together.
+    </div>
+    </div>
+</body>
+</html>
