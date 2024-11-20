@@ -110,6 +110,24 @@
             height: 175px;
         }
 
+        .image-grid img.large {
+            width: 800px;
+            height: 600px;
+            image-rendering: auto;
+        }
+
+        .image-grid img.long {
+            width: 800px;
+            height: 300px;
+            image-rendering: auto;
+        }
+
+        .image-grid img.smalllong {
+            width: 500px;
+            height: 250px;
+            image-rendering: auto;
+        }
+
         .image-grid figcaption {
             font-size: 1em;
             text-align: center;
@@ -864,6 +882,8 @@
                 </figure>
             </div>
 
+            <br>
+
             <div class="image-grid">
                 <figure>
                     <img src="media/part_A/sampling_loops/inpaint/inpaint_flower_full.png" alt="Image 3">
@@ -1223,8 +1243,40 @@
 
             <h4 class="section-subsubtitle">1.1 Implementing the UNet</h4>
             <h4 class="section-subsubtitle">1.2 Using the UNet to Train a Denoiser</h4>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_B/part_1/noisy_images.png" alt="Image 3" class="large">
+                    <figcaption>...</figcaption>
+                </figure>
+            </div>
+
             <h5 class="section-subsubsubtitle">1.2.1 Training</h5>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_B/part_1/training_losses.png" alt="Image 3" class="smooth">
+                    <figcaption>...</figcaption>
+                </figure>
+            </div>
+
+            <br>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_B/part_1/output_1_5.png" alt="Image 3" class="large">
+                    <figcaption>...</figcaption>
+                </figure>
+            </div>
+
             <h5 class="section-subsubsubtitle">1.2.2 Out-of-Distribution Testing</h5>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_B/part_1/out_of_dist.png" alt="Image 3" class="long">
+                    <figcaption>...</figcaption>
+                </figure>
+            </div>
 
             <h3 class="section-subtitle">Part 2: Training a Diffusion Model</h3>
             <p>
@@ -1233,9 +1285,73 @@
 
             <h4 class="section-subsubtitle">2.1 Adding Time Conditioning to UNet</h4>
             <h4 class="section-subsubtitle">2.2 Training the UNet</h4>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_B/part_2/time_losses.png" alt="Image 3" class="smooth">
+                    <figcaption>...</figcaption>
+                </figure>
+            </div>
+
             <h4 class="section-subsubtitle">2.3 Sampling from the UNet</h4>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_B/part_2/time_samples_1.png" alt="Image 3" class="smalllong">
+                    <figcaption>...</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_B/part_2/time_samples_5.png" alt="Image 3" class="smalllong">
+                    <figcaption>...</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_B/part_2/time_samples_10.png" alt="Image 3" class="smalllong">
+                    <figcaption>...</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_B/part_2/time_samples_20.png" alt="Image 3" class="smalllong">
+                    <figcaption>...</figcaption>
+                </figure>
+            </div>
+
             <h4 class="section-subsubtitle">2.4 Adding Class-Conditioning to UNet</h4>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_B/part_2/class_losses.png" alt="Image 3" class="smooth">
+                    <figcaption>...</figcaption>
+                </figure>
+            </div>
+
             <h4 class="section-subsubtitle">2.5 Sampling from the Class-Conditioned UNet</h4>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_B/part_2/class_samples_1.png" alt="Image 3" class="smalllong">
+                    <figcaption>...</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_B/part_2/class_samples_5.png" alt="Image 3" class="smalllong">
+                    <figcaption>...</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_B/part_2/class_samples_10.png" alt="Image 3" class="smalllong">
+                    <figcaption>...</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_B/part_2/class_samples_20.png" alt="Image 3" class="smalllong">
+                    <figcaption>...</figcaption>
+                </figure>
+            </div>
+
+            <br>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_B/part_2/transformation.gif" alt="Image 3" class="long">
+                    <figcaption>...</figcaption>
+                </figure>
+            </div>
         </div>
         <br>
     </div>
