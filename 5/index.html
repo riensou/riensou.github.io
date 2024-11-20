@@ -204,12 +204,12 @@
 
             <h3 class="section-subtitle">Part 0: Setup</h3>
             <p>
-                First, I load the DeepFloyd IF diffusion model from Hugging Face. Since DeepFloyd was trained
-                as a text-to-image model, I also load some precomputed text embeddings. Among those is the 
+                First, we load the DeepFloyd IF diffusion model from Hugging Face. Since DeepFloyd was trained
+                as a text-to-image model, we also need to load some precomputed text embeddings. Among those is the 
                 embedding for the prompt "a high quality photo", which I will later use as a pseudo-null 
-                prompt. For now, I test the model on three other prompts. Note that the model has multiple
-                stages, which output images at progressively higher resolutions. For now, I use the first two
-                stages, but later on I will just use the first stage.
+                prompt. For now, we test the model on three other prompts. Note that the model has multiple
+                stages, which output images at progressively higher resolutions. For now, we use the first two
+                stages, but later on we will just use the first stage.
             </p>
 
             <div class="image-grid">
@@ -555,8 +555,8 @@
 
                 where $\gamma$ is a hyperparameter that controls the strength of CFG. Intuitively,
                 $\epsilon_{CFG}$ can be thought of as noise moving <i>more</i> in the direction
-                of the condition given to the model. To get $\epsilon_c$, I use the embedding for the prompt "a high quality photo" and to
-                get $\epsilon_u$, I use the embedding for the empty string.
+                of the condition given to the model. To get $\epsilon_c$, we use the embedding for the prompt "a high quality photo" and to
+                get $\epsilon_u$, we use the embedding for the empty string.
                 
                 <br><br>
 
@@ -802,10 +802,411 @@
             </div>
 
             <h5 class="section-subsubsubtitle">1.7.2 Inpainting</h5>
+
+            <p>
+                The above procedure makes edits to the entire image. Suppose we just want to change
+                part of the image. This (inpainting) is also possible with diffusion models. Following
+                the <a href="https://arxiv.org/abs/2201.09865">RePaint</a> paper, we can perform inpainting by
+                repeating the above procedure but forcing $x_t$ to have the same pixels as our original image 
+                wherever we don't want things to change.
+
+                <br><br>
+
+                That is, suppose we are given an image $x_{\text{orig}}$ and binary mask $\mathbf{m}$. We create
+                a new image that has the same content as $x_{\text{orig}}$ wherever $\mathbf{m}$ is $0$ and new 
+                content wherever $\mathbf{m}$ is $1$. We accomplish this by setting $x_t$ to $x_{\text{orig}}$ 
+                wherever $\mathbf{m}$ is 0 after every step, as described by the following:
+
+                $$x_t\leftarrow \mathbf{m}x_t + \text{forward}(x_{\text{orig}}, t)$$
+
+                Performing this procedure yeilds the following:
+            </p>
+
+            <br>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_A/sampling_loops/forward/campanile.png" alt="Image 3">
+                    <figcaption>Campanile</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/inpaint/inpaint_test_im_mask.png" alt="Image 3">
+                    <figcaption>Mask</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/inpaint/inpaint_test_im_replace.png" alt="Image 3">
+                    <figcaption>Section to be replaced</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/inpaint/inpaint_test_im.png" alt="Image 3">
+                    <figcaption>Campanile Inpainted</figcaption>
+                </figure>
+            </div>
+
+            <br>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_A/sampling_loops/inpaint/inpaint_chicken_full.png" alt="Image 3">
+                    <figcaption>Chicken</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/inpaint/inpaint_chicken_mask.png" alt="Image 3">
+                    <figcaption>Mask</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/inpaint/inpaint_chicken_to_replace.png" alt="Image 3">
+                    <figcaption>Section to be replaced</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/inpaint/inpaint_chicken.png" alt="Image 3">
+                    <figcaption>Chicken Inpainted</figcaption>
+                </figure>
+            </div>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_A/sampling_loops/inpaint/inpaint_flower_full.png" alt="Image 3">
+                    <figcaption>Flower</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/inpaint/inpaint_flower_mask.png" alt="Image 3">
+                    <figcaption>Mask</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/inpaint/inpaint_flower_to_replace.png" alt="Image 3">
+                    <figcaption>Section to be replaced</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/inpaint/inpaint_flower.png" alt="Image 3">
+                    <figcaption>Flower Inpainted</figcaption>
+                </figure>
+            </div>
+
             <h5 class="section-subsubsubtitle">1.7.3 Text-Conditional Image-to-Image Translation</h5>
+
+            <p>
+                ...
+            </p>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_A/sampling_loops/text-conditional/tower/tower_1.png" alt="Image 3" class="tiny">
+                    <figcaption><i>a rocket ship</i><br>on Campanile<br>with $i_{\text{start}}=1$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/text-conditional/tower/tower_3.png" alt="Image 3" class="tiny">
+                    <figcaption><i>a rocket ship</i><br>on Campanile<br>with $i_{\text{start}}=3$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/text-conditional/tower/tower_5.png" alt="Image 3" class="tiny">
+                    <figcaption><i>a rocket ship</i><br>on Campanile<br>with $i_{\text{start}}=5$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/text-conditional/tower/tower_7.png" alt="Image 3" class="tiny">
+                    <figcaption><i>a rocket ship</i><br>on Campanile<br>with $i_{\text{start}}=1$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/text-conditional/tower/tower_10.png" alt="Image 3" class="tiny">
+                    <figcaption><i>a rocket ship</i><br>on Campanile<br>with $i_{\text{start}}=10$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/text-conditional/tower/tower_20.png" alt="Image 3" class="tiny">
+                    <figcaption><i>a rocket ship</i><br>on Campanile<br>with $i_{\text{start}}=20$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/text-conditional/tower/tower.png" alt="Image 3" class="tiny">
+                    <figcaption>Original Campanile</figcaption>
+                </figure>
+            </div>
+
+            <br>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_A/sampling_loops/text-conditional/ryan_hike/ryan_hike_1.png" alt="Image 3" class="tiny">
+                    <figcaption><i>an oil painting of an <br>old man</i> on Ryan<br>with $i_{\text{start}}=1$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/text-conditional/ryan_hike/ryan_hike_3.png" alt="Image 3" class="tiny">
+                    <figcaption><i>an oil painting of an <br>old man</i> on Ryan<br>with $i_{\text{start}}=3$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/text-conditional/ryan_hike/ryan_hike_5.png" alt="Image 3" class="tiny">
+                    <figcaption><i>an oil painting of an <br>old man</i> on Ryan<br>with $i_{\text{start}}=5$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/text-conditional/ryan_hike/ryan_hike_7.png" alt="Image 3" class="tiny">
+                    <figcaption><i>an oil painting of an <br>old man</i> on Ryan<br>with $i_{\text{start}}=1$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/text-conditional/ryan_hike/ryan_hike_10.png" alt="Image 3" class="tiny">
+                    <figcaption><i>an oil painting of an <br>old man</i> on Ryan<br>with $i_{\text{start}}=10$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/text-conditional/ryan_hike/ryan_hike_20.png" alt="Image 3" class="tiny">
+                    <figcaption><i>an oil painting of an <br>old man</i> on Ryan<br>with $i_{\text{start}}=20$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/text-conditional/ryan_hike/ryan_hike.png" alt="Image 3" class="tiny">
+                    <figcaption>Original Ryan</figcaption>
+                </figure>
+            </div>
+
+            <br>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_A/sampling_loops/text-conditional/cat/cat_1.png" alt="Image 3" class="tiny">
+                    <figcaption><i>a photo of a dog</i><br>on Cat<br>with $i_{\text{start}}=1$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/text-conditional/cat/cat_3.png" alt="Image 3" class="tiny">
+                    <figcaption><i>a photo of a dog</i><br>on Cat<br>with $i_{\text{start}}=3$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/text-conditional/cat/cat_5.png" alt="Image 3" class="tiny">
+                    <figcaption><i>a photo of a dog</i><br>on Cat<br>with $i_{\text{start}}=5$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/text-conditional/cat/cat_7.png" alt="Image 3" class="tiny">
+                    <figcaption><i>a photo of a dog</i><br>on Cat<br>with $i_{\text{start}}=1$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/text-conditional/cat/cat_10.png" alt="Image 3" class="tiny">
+                    <figcaption><i>a photo of a dog</i><br>on Cat<br>with $i_{\text{start}}=10$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/text-conditional/cat/cat_20.png" alt="Image 3" class="tiny">
+                    <figcaption><i>a photo of a dog</i><br>on Cat<br>with $i_{\text{start}}=20$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/text-conditional/cat/cat.png" alt="Image 3" class="tiny">
+                    <figcaption>Original Cat</figcaption>
+                </figure>
+            </div>
+
             <h4 class="section-subsubtitle">1.8 Visual Anagrams</h4>
+
+            <p>
+                ...
+            </p>
+
+            <br>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_A/sampling_loops/visual_anagrams/campfire_man_1.png" alt="Image 3">
+                    <figcaption>
+                        <u>up</u>: <i>an oil painting of people around a campfire</i>
+                        <br>
+                        <u>down</u>: <i>an oil painting of an old man</i>
+                        <br>
+                        Sample 1
+                    </figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/visual_anagrams/campfire_man_2.png" alt="Image 3">
+                    <figcaption>
+                        <u>up</u>: <i>an oil painting of people around a campfire</i>
+                        <br>
+                        <u>down</u>: <i>an oil painting of an old man</i>
+                        <br>
+                        Sample 2
+                    </figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/visual_anagrams/campfire_man_3.png" alt="Image 3">
+                    <figcaption>
+                        <u>up</u>: <i>an oil painting of people around a campfire</i>
+                        <br>
+                        <u>down</u>: <i>an oil painting of an old man</i>
+                        <br>
+                        Sample 3
+                    </figcaption>
+                </figure>
+            </div>
+
+            <br>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_A/sampling_loops/visual_anagrams/snowy_amalfi_1.png" alt="Image 3">
+                    <figcaption>
+                        <u>up</u>: <i>an oil painting of a snowy mountain village</i>
+                        <br>
+                        <u>down</u>: <i>a photo of the amalfi cost</i>
+                        <br>
+                        Sample 1
+                    </figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/visual_anagrams/snowy_amalfi_2.png" alt="Image 3">
+                    <figcaption>
+                        <u>up</u>: <i>an oil painting of a snowy mountain village</i>
+                        <br>
+                        <u>down</u>: <i>a photo of the amalfi cost</i>
+                        <br>
+                        Sample 2
+                    </figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/visual_anagrams/snowy_amalfi_3.png" alt="Image 3">
+                    <figcaption>
+                        <u>up</u>: <i>an oil painting of a snowy mountain village</i>
+                        <br>
+                        <u>down</u>: <i>a photo of the amalfi cost</i>
+                        <br>
+                        Sample 3
+                    </figcaption>
+                </figure>
+            </div>
+
+            <br>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_A/sampling_loops/visual_anagrams/man_dog_1.png" alt="Image 3">
+                    <figcaption>
+                        <u>up</u>: <i>a man wearing a hat</i>
+                        <br>
+                        <u>down</u>: <i>a photo of a dog</i>
+                        <br>
+                        Sample 1
+                    </figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/visual_anagrams/man_dog_2.png" alt="Image 3">
+                    <figcaption>
+                        <u>up</u>: <i>a man wearing a hat</i>
+                        <br>
+                        <u>down</u>: <i>a photo of a dog</i>
+                        <br>
+                        Sample 2
+                    </figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/visual_anagrams/man_dog_3.png" alt="Image 3">
+                    <figcaption>
+                        <u>up</u>: <i>a man wearing a hat</i>
+                        <br>
+                        <u>down</u>: <i>a photo of a dog</i>
+                        <br>
+                        Sample 3
+                    </figcaption>
+                </figure>
+            </div>
+
             <h4 class="section-subsubtitle">1.9 Hybrid Images</h4>
 
+            <p>
+                ...
+            </p>
+            
+            <br>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_A/sampling_loops/hybrid_images/waterfall_skull/waterfall_skull_1.png" alt="Image 3">
+                    <figcaption>
+                        <u>low</u>: <i>a lithograph of a skull</i>
+                        <br>
+                        <u>high</u>: <i>a lithograph of waterfalls</i>
+                        <br>
+                        Sample 1
+                    </figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/hybrid_images/waterfall_skull/waterfall_skull_2.png" alt="Image 3">
+                    <figcaption>
+                        <u>low</u>: <i>a lithograph of a skull</i>
+                        <br>
+                        <u>high</u>: <i>a lithograph of waterfalls</i>
+                        <br>
+                        Sample 2
+                    </figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/hybrid_images/waterfall_skull/waterfall_skull_3.png" alt="Image 3">
+                    <figcaption>
+                        <u>low</u>: <i>a lithograph of a skull</i>
+                        <br>
+                        <u>high</u>: <i>a lithograph of waterfalls</i>
+                        <br>
+                        Sample 3
+                    </figcaption>
+                </figure>
+            </div>
+
+            <br>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_A/sampling_loops/hybrid_images/hat_dog/hat_dog_1.png" alt="Image 3">
+                    <figcaption>
+                        <u>low</u>: <i>a photo of a dog</i>
+                        <br>
+                        <u>high</u>: <i>a man wearing a hat</i>
+                        <br>
+                        Sample 1
+                    </figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/hybrid_images/hat_dog/hat_dog_2.png" alt="Image 3">
+                    <figcaption>
+                        <u>low</u>: <i>a photo of a dog</i>
+                        <br>
+                        <u>high</u>: <i>a man wearing a hat</i>
+                        <br>
+                        Sample 2
+                    </figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/hybrid_images/hat_dog/hat_dog_3.png" alt="Image 3">
+                    <figcaption>
+                        <u>low</u>: <i>a photo of a dog</i>
+                        <br>
+                        <u>high</u>: <i>a man wearing a hat</i>
+                        <br>
+                        Sample 3
+                    </figcaption>
+                </figure>
+            </div>
+
+            <br>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_A/sampling_loops/hybrid_images/rocket_pencil/rocket_pencil_1.png" alt="Image 3">
+                    <figcaption>
+                        <u>low</u>: <i>a pencil</i>
+                        <br>
+                        <u>high</u>: <i>a rocket ship</i>
+                        <br>
+                        Sample 1
+                    </figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/hybrid_images/rocket_pencil/rocket_pencil_2.png" alt="Image 3">
+                    <figcaption>
+                        <u>low</u>: <i>a pencil</i>
+                        <br>
+                        <u>high</u>: <i>a rocket ship</i>
+                        <br>
+                        Sample 2
+                    </figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/hybrid_images/rocket_pencil/rocket_pencil_3.png" alt="Image 3">
+                    <figcaption>
+                        <u>low</u>: <i>a pencil</i>
+                        <br>
+                        <u>high</u>: <i>a rocket ship</i>
+                        <br>
+                        Sample 3
+                    </figcaption>
+                </figure>
+            </div>
         </div>
 
         <br>
