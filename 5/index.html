@@ -81,18 +81,40 @@
         }
 
         .image-grid img {
-            max-width: 200px;
-            max-height: 200px;
+            width: 200px;
+            height: 200px;
+            image-rendering: pixelated;
             object-fit: contain;
+            margin: 5px 20px;
+        }
+
+        .image-grid img.smooth {
+            image-rendering: auto;
+            width: 500px;
+            height: 300px;
+        }
+
+        .image-grid img.tiny {
+            width: 140px;
+            height: 140px;
+            margin: 5px;
+        }
+
+        .image-grid img.small {
+            width: 125px;
+            height: 125px;
+        }
+
+        .image-grid img.medium {
+            width: 175px;
+            height: 175px;
         }
 
         .image-grid figcaption {
-            margin-top: 5px;
-            font-size: 0.9em;
-            color: #555; /* Light gray for the caption text */
+            font-size: 1em;
             text-align: center;
-            margin-left: 5px; /* Increase left margin */
-            margin-right: 5px; /* Increase right margin */
+            max-width: 300px;
+            word-wrap: break-word;
         }
 
         .section-title {
@@ -114,7 +136,25 @@
             font-size: 1.1em;
             margin-bottom: 10px;
         }
+        a {
+        color: #964DCC; /* Link color */
+        text-decoration: none; /* Remove underline */
+        }
+
+        a:hover {
+            color: #660099; /* Change color on hover */
+        }
     </style>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']] // Enable single-dollar signs for inline math
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
 </head>
 <body>
     <header>
@@ -124,37 +164,648 @@
     <div class="container">
         <br>
         <div class="section">
+            <p>
+                In this project, I deploy and implement <a href="https://en.wikipedia.org/wiki/Diffusion_model">diffusion models</a>,
+                a type of generative model for images. Diffusion models work by learning learning to remove noise from an
+                image to move it back onto the natural image manifold.
+                
+                <br><br>
+                
+                First, I deploy the 
+                <a href="https://huggingface.co/docs/diffusers/api/pipelines/deepfloyd_if">DeepFloyd IF</a>, a diffusion model
+                trained by <a href="https://stability.ai/">Stability AI</a>. Using this model, I showcase the capabilities
+                of diffusion models by demonstrating sampling, denoising, image-to-image translation, inpainting, visual
+                anagrams, and hybrid images. 
+                
+                <br><br>
+
+                Second, I implement a diffusion model from scratch
+                to generate handwritten digits by training on the <a href="https://en.wikipedia.org/wiki/MNIST_database">MNIST dataset</a>.
+                I utilize the <a href="https://arxiv.org/abs/1505.04597">U-Net</a> architecture to implement models capable of 
+                one-step denoising and diffusion (with time and class conditiong). I also implement sampling with 
+                <a href="https://arxiv.org/abs/2207.12598">classifer-free guidance</a> (CFG) to improve the results of the 
+                generated images.
+
+            </p>
+            <div class="image-grid">
+                <figure>
+                    <img src="media/intro/deepfloyd.jpg" alt="Image 1" class="smooth">
+                    <figcaption>The DeepFloyd IF Diffusion Model</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/intro/mnist.jpeg" alt="Image 2" class="smooth">
+                    <figcaption>The MNIST Dataset</figcaption>
+                </figure>
+            </div>
+
+            <br>
+
             <h2 class="section-title">Part A: The Power of Diffusion Models!</h2>
 
             <h3 class="section-subtitle">Part 0: Setup</h3>
             <p>
-                ...
+                First, I load the DeepFloyd IF diffusion model from Hugging Face. Since DeepFloyd was trained
+                as a text-to-image model, I also load some precomputed text embeddings. Among those is the 
+                embedding for the prompt "a high quality photo", which I will later use as a pseudo-null 
+                prompt. For now, I test the model on three other prompts. Note that the model has multiple
+                stages, which output images at progressively higher resolutions. For now, I use the first two
+                stages, but later on I will just use the first stage.
             </p>
 
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_A/setup/village_small_20.png" alt="Image 1">
+                    <figcaption><i>an oil painting of a snowy mountain village</i><br>
+                    (stage 1, num_inference_steps=20)</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/setup/man_small_20.png" alt="Image 2">
+                    <figcaption><i>a man wearing a hat</i><br>
+                        (stage 1, num_inference_steps=20)</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/setup/rocket_small_20.png" alt="Image 3">
+                    <figcaption><i>a rocket ship</i><br>
+                        (stage 1, num_inference_steps=20)</figcaption>
+                </figure>
+            </div>
+
+            <br>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_A/setup/village_20.png" alt="Image 1">
+                    <figcaption><i>an oil painting of a snowy mountain village</i><br>
+                        (stage 2, num_inference_steps=20)</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/setup/man_20.png" alt="Image 2">
+                    <figcaption><i>a man wearing a hat</i><br>
+                        (stage 2, num_inference_steps=20)</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/setup/rocket_20.png" alt="Image 3">
+                    <figcaption><i>a rocket ship</i><br>
+                        (stage 2, num_inference_steps=20)</figcaption>
+                </figure>
+            </div>
+
+            <br>
+
+            <p>
+                The above images were sampled with 20 inference steps. This means that the diffusion model was 
+                run 20 times for each image. During the training of DeepFloyd, the noising/denoising process was split
+                into $T=1000$ steps, but it turns out that during inference, we can get away with significantly reducing
+                the number of steps. That being said, decreasing the number of steps too much
+                can reduce the quality, as it gives less opportunity for fine details to be accounted for. The 
+                following were generated with the same prompts, but with twice the number of inference steps, and
+                seem to be of much higher quality.
+            </p>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_A/setup/village_small_40.png" alt="Image 1">
+                    <figcaption><i>an oil painting of a snowy mountain village</i><br>
+                        (stage 1, num_inference_steps=40)</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/setup/man_small_40.png" alt="Image 2">
+                    <figcaption><i>a man wearing a hat</i><br>
+                        (stage 1, num_inference_steps=40)</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/setup/rocket_small_40.png" alt="Image 3">
+                    <figcaption><i>a rocket ship</i><br>
+                        (stage 1, num_inference_steps=40)</figcaption>
+                </figure>
+            </div>
+
+            <br>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_A/setup/village_40.png" alt="Image 1">
+                    <figcaption><i>an oil painting of a snowy mountain village</i><br>
+                        (stage 2, num_inference_steps=40)</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/setup/man_40.png" alt="Image 2">
+                    <figcaption><i>a man wearing a hat</i><br>
+                        (stage 2, num_inference_steps=40)</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/setup/rocket_40.png" alt="Image 3">
+                    <figcaption><i>a rocket ship</i><br>
+                        (stage 2, num_inference_steps=40)</figcaption>
+                </figure>
+            </div>
+
+            <br>
 
             <h3 class="section-subtitle">Part 1: Sampling Loops</h3>
-            <p>
-                ...
-            </p>
             <h4 class="section-subsubtitle">1.1 Implementing the Forward Process</h4>
+
+            <p>
+                The forward process is a key part of diffusion. This is the process by a which a clean image
+                is turned into noise. The following defines the forward process:
+                
+                $$q(x_t\mid x_0)=\mathcal{N}(x_t;\sqrt{\bar{\alpha}}x_0,(1-\bar{\alpha}_t)\mathbf{I})$$
+
+                This is equivalent to computing $x_t=\sqrt{\bar{\alpha}_t}x_0+\sqrt{1-\bar{\alpha}_t}\epsilon$
+                where $\epsilon\sim\mathcal{N}(0, 1)$. Note that $t=0$ corresponds to the clean image and larger
+                values of $t$ correspond to larger amounts of noise being injected into the image.
+
+                <br><br>
+
+                Using the scheduler from the first stage of DeepFloyd, we can recover the values of $\bar{\alpha}_t$
+                for $t\in[0,999]$. Using these values, we can visualize the forward process on a familiar tower.
+            </p>
+
+            <br>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_A/sampling_loops/forward/campanile.png" alt="Image 1">
+                    <figcaption>The <a href="https://en.wikipedia.org/wiki/Sather_Tower">Campanile</a></figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/forward/t=250.png" alt="Image 2">
+                    <figcaption>Noisy Campanile<br>$(t=250)$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/forward/t=500.png" alt="Image 3">
+                    <figcaption>Noisy Campanile<br>$(t=500)$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/forward/t=750.png" alt="Image 3">
+                    <figcaption>Noisy Campanile<br>$(t=750)$</figcaption>
+                </figure>
+            </div>
+
             <h4 class="section-subsubtitle">1.2 Classical Denoising</h4>
+
+            <p>
+                Suppose we are given a noisy image and wish to denoise it using strictly classical methods. Using 
+                <a href="https://en.wikipedia.org/wiki/Gaussian_blur">Gaussian blur filtering</a>, we can attempt
+                to remove some noise, though we will later see that diffusion models do a much better job. The following
+                are attempts at denoising the noisy images using this technique:
+            </p>
+
+            <br>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_A/sampling_loops/forward/t=250.png" alt="Image 2">
+                    <figcaption>Noisy Campanile<br>$(t=250)$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/forward/t=500.png" alt="Image 3">
+                    <figcaption>Noisy Campanile<br>$(t=500)$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/forward/t=750.png" alt="Image 3">
+                    <figcaption>Noisy Campanile<br>$(t=750)$</figcaption>
+                </figure>
+            </div>
+
+            <br>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_A/sampling_loops/classical_denoising/t=250_classical_denoise.png" alt="Image 2">
+                    <figcaption>Gaussian Blur Denoising<br>$(t=250)$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/classical_denoising/t=500_classical_denoise.png" alt="Image 3">
+                    <figcaption>Gaussian Blur Denoising<br>$(t=500)$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/classical_denoising/t=750_classical_denoise.png" alt="Image 3">
+                    <figcaption>Gaussian Blur Denoising<br>$(t=750)$</figcaption>
+                </figure>
+            </div>
+
             <h4 class="section-subsubtitle">1.3 One-Step Denoising</h4>
+
+            <p>
+                Next, we'll try to use diffusion models to denoise the noisy images. While classical methods
+                are unable to recover lost information, machine-learning-based methods are able to utilize their
+                training from a vast set of images to hallucinate information and project onto the natural image
+                manifold.
+
+                <br><br>
+
+                As discussed earlier, we use the embedding for the prompt "a high quality photo" as conditioning for
+                the model. The following are the one-step denoising results:
+            </p>
+
+            <br>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_A/sampling_loops/forward/t=250.png" alt="Image 2">
+                    <figcaption>Noisy Campanile<br>$(t=250)$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/forward/t=500.png" alt="Image 3">
+                    <figcaption>Noisy Campanile<br>$(t=500)$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/forward/t=750.png" alt="Image 3">
+                    <figcaption>Noisy Campanile<br>$(t=750)$</figcaption>
+                </figure>
+            </div>
+
+            <br>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_A/sampling_loops/one_step_denoising/t=250_unet_denoise.png" alt="Image 2">
+                    <figcaption>One-step Denoising<br>$(t=250)$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/one_step_denoising/t=500_unet_denoise.png" alt="Image 3">
+                    <figcaption>One-step Denoising<br>$(t=500)$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/one_step_denoising/t=750_unet_denoise.png" alt="Image 3">
+                    <figcaption>One-step Denoising<br>$(t=750)$</figcaption>
+                </figure>
+            </div>
+
             <h4 class="section-subsubtitle">1.4 Iterative Denoising</h4>
+
+            <p>
+                While this performs much better than the classical method, it does get worse as more noise is added.
+                This makes sense as the problem is harder and diffusion models are designed to iteratively denoise
+                rather than doing it all in one step.
+
+                <br><br>
+
+                While this diffusion model was trained on $T=1000$ denoising steps, we can actually skip steps
+                as mentioned earlier. We do this by denoising from $t=990$ to $t=0$ with a stride of $30$. That is,
+                we consider the following values of $t$: $990,960,930,\ldots,60,30,0$.
+
+                <br><br>
+
+                To denoise, we implement the following formula:
+
+                $$x_{t'}=\frac{\sqrt{\bar{\alpha}_{t'}}\beta_t}{1-\bar{\alpha}_t}x_0+
+                \frac{\sqrt{\alpha_t}(1-\bar{\alpha}_{t'})}{1-\bar{\alpha}_t}x_t + v_\sigma,$$
+
+                where $t$ is the current timestep, $t'$ is the 
+                next timestep, $\bar{\alpha}_t$ is as explained above, $x_t$ is the current noisy image,
+                $x_{t'}$ is the (less) noisy image at timestep $t'$, $\alpha_t=\frac{\bar{\alpha}_t}{\bar{\alpha}_{t'}}$,
+                $\beta_t=1-\alpha_t$, and $v_\sigma$ is random noise (in this case predicted by DeepFloyd).
+
+                <br><br>
+
+                Starting at $t=690$, we get the following results for iterative denoising, one-step denoising, 
+                and Gaussian blur denoising:
+            </p>
+
+            <br>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_A/sampling_loops/iteratively_denoising/noisy_t=690.png" alt="Image 3" class="small">
+                    <figcaption>Iterative Blur Denoising<br>$(t=690)$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/iteratively_denoising/noisy_t=540.png" alt="Image 3" class="small">
+                    <figcaption>Iterative Denoising<br>$(t=540)$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/iteratively_denoising/noisy_t=390.png" alt="Image 3" class="small">
+                    <figcaption>Iterative Denoising<br>$(t=390)$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/iteratively_denoising/noisy_t=240.png" alt="Image 3" class="small">
+                    <figcaption>Iterative Denoising<br>$(t=240)$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/iteratively_denoising/noisy_t=90.png" alt="Image 2" class="small">
+                    <figcaption>Iterative Denoising<br>$(t=90)$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/iteratively_denoising/iteratively_denoised.png" alt="Image 2" class="small">
+                    <figcaption>Iterative Denoising<br>$(t=0)$</figcaption>
+                </figure>
+            </div>
+
+            <br>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_A/sampling_loops/iteratively_denoising/gaussian_blurred.png" alt="Image 3" class="small">
+                    <figcaption>Gaussian Blur Denoising<br>$(t=690)$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/iteratively_denoising/one_step_denoised.png" alt="Image 3" class="small">
+                    <figcaption>One-step Denoising<br>$(t=690)$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/forward/campanile.png" alt="Image 3" class="small">
+                    <figcaption>Original Image</figcaption>
+                </figure>
+            </div>
+
             <h4 class="section-subsubtitle">1.5 Diffusion Model Sampling</h4>
+
+            <p>
+                Using the same procedure defined above, we can generate images from scratch rather than just denoising an image.
+                By passing in complete noise, we can denoise pure noise to generate new images. Doing this yields the following:
+            </p>
+
+            <br>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_A/sampling_loops/diffusion_model_sampling/sample1.png" alt="Image 3" class="medium">
+                    <figcaption>Sample 1</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/diffusion_model_sampling/sample2.png" alt="Image 3" class="medium">
+                    <figcaption>Sample 2</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/diffusion_model_sampling/sample3.png" alt="Image 3" class="medium">
+                    <figcaption>Sample 3</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/diffusion_model_sampling/sample4.png" alt="Image 3" class="medium">
+                    <figcaption>Sample 4</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/diffusion_model_sampling/sample5.png" alt="Image 2" class="medium">
+                    <figcaption>Sample 5</figcaption>
+                </figure>
+            </div>
+
             <h4 class="section-subsubtitle">1.6 Classifier-Free Guidance (CFG)</h4>
-            <h4 class="section-subsubtitle">1.7 Image-to-image Translation</h4>
-            <h4 class="section-subsubsubtitle">1.7.1 Editing Hand-Drawn and Web Images</h4>
-            <h4 class="section-subsubsubtitle">1.7.2 Inpainting</h4>
-            <h4 class="section-subsubsubtitle">1.7.3 Text-Conditional Image-to-image Translation</h4>
+
+            <p>
+                The quality of the above images leaves a lot of room for improvement. One easy way
+                to improve the quality is to use a technique known as classifer-free guidance (CFG).
+                In CFG, we compute conditional and unconditional noise estimates, denoted by 
+                $\epsilon_c$ and $\epsilon_u$ respectively. We then define our new noise estimate by
+                the following:
+
+                $$\epsilon_{CFG}=\epsilon_u+\gamma(\epsilon_c - \epsilon_u),$$
+
+                where $\gamma$ is a hyperparameter that controls the strength of CFG. Intuitively,
+                $\epsilon_{CFG}$ can be thought of as noise moving <i>more</i> in the direction
+                of the condition given to the model. To get $\epsilon_c$, I use the embedding for the prompt "a high quality photo" and to
+                get $\epsilon_u$, I use the embedding for the empty string.
+                
+                <br><br>
+
+                The following were generated using CFG with $\gamma=7$:
+            </p>
+
+            <br>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_A/sampling_loops/cfg/cfg_1.png" alt="Image 3" class="medium">
+                    <figcaption>Sample 1 (with CFG)</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/cfg/cfg_2.png" alt="Image 3" class="medium">
+                    <figcaption>Sample 2 (with CFG)</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/cfg/cfg_3.png" alt="Image 3" class="medium">
+                    <figcaption>Sample 3 (with CFG)</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/cfg/cfg_4.png" alt="Image 3" class="medium">
+                    <figcaption>Sample 4 (with CFG)</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/cfg/cfg_5.png" alt="Image 2" class="medium">
+                    <figcaption>Sample 5 (with CFG)</figcaption>
+                </figure>
+            </div>
+
+            <h4 class="section-subsubtitle">1.7 Image-to-Image Translation</h4>
+
+            <p>
+                In 1.4, we took an image, added noise to it, and then denoised it. This allowed us to make edits to
+                a preexisting image. Here, we do this again, this time using CFG. This follows the <a href="https://sde-image-editing.github.io/">SDEdit</a>
+                algorithm. The following showcases this process, with $i_{\text{start}}\in\{1,3,5,7,10,20\}$, where larger
+                $i_{\text{start}}$ means less noise to start with.
+            </p>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_A/sampling_loops/image_to_image/cfg_denoise_1.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Campanile<br>with $i_{\text{start}}=1$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/image_to_image/cfg_denoise_3.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Campanile<br>with $i_{\text{start}}=3$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/image_to_image/cfg_denoise_5.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Campanile<br>with $i_{\text{start}}=5$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/image_to_image/cfg_denoise_7.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Campanile<br>with $i_{\text{start}}=1$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/image_to_image/cfg_denoise_10.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Campanile<br>with $i_{\text{start}}=10$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/image_to_image/cfg_denoise_20.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Campanile<br>with $i_{\text{start}}=20$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/forward/campanile.png" alt="Image 3" class="tiny">
+                    <figcaption>Original Campanile</figcaption>
+                </figure>
+            </div>
+
+            <br>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_A/sampling_loops/image_to_image/piano/piano_1.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Piano<br>with $i_{\text{start}}=1$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/image_to_image/piano/piano_3.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Piano<br>with $i_{\text{start}}=3$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/image_to_image/piano/piano_5.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Piano<br>with $i_{\text{start}}=5$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/image_to_image/piano/piano_7.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Piano<br>with $i_{\text{start}}=1$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/image_to_image/piano/piano_10.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Piano<br>with $i_{\text{start}}=10$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/image_to_image/piano/piano_20.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Piano<br>with $i_{\text{start}}=20$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/image_to_image/piano/piano.png" alt="Image 3" class="tiny">
+                    <figcaption>Original Piano</figcaption>
+                </figure>
+            </div>
+
+            <br>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_A/sampling_loops/image_to_image/ryan/ryan_1.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Ryan<br>with $i_{\text{start}}=1$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/image_to_image/ryan/ryan_3.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Ryan<br>with $i_{\text{start}}=3$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/image_to_image/ryan/ryan_5.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Ryan<br>with $i_{\text{start}}=5$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/image_to_image/ryan/ryan_7.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Ryan<br>with $i_{\text{start}}=1$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/image_to_image/ryan/ryan_10.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Ryan<br>with $i_{\text{start}}=10$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/image_to_image/ryan/ryan_20.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Ryan<br>with $i_{\text{start}}=20$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/image_to_image/ryan/ryan.png" alt="Image 3" class="tiny">
+                    <figcaption>Original Ryan</figcaption>
+                </figure>
+            </div>
+
+            <h5 class="section-subsubsubtitle">1.7.1 Editing Hand-Drawn and Web Images</h5>
+
+            <p>
+                Repeating this process on hand-drawn images yields the following:
+            </p>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_A/sampling_loops/editing_hand_web/landscape_1.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Landscape<br>with $i_{\text{start}}=1$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/editing_hand_web/landscape_3.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Landscape<br>with $i_{\text{start}}=3$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/editing_hand_web/landscape_5.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Landscape<br>with $i_{\text{start}}=5$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/editing_hand_web/landscape_7.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Landscape<br>with $i_{\text{start}}=1$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/editing_hand_web/landscape_10.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Landscape<br>with $i_{\text{start}}=10$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/editing_hand_web/landscape_20.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Landscape<br>with $i_{\text{start}}=20$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/editing_hand_web/landscape.png" alt="Image 3" class="tiny">
+                    <figcaption>Original Landscape</figcaption>
+                </figure>
+            </div>
+
+            <br>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_A/sampling_loops/editing_hand_web/minion_1.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Minion<br>with $i_{\text{start}}=1$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/editing_hand_web/minion_3.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Minion<br>with $i_{\text{start}}=3$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/editing_hand_web/minion_5.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Minion<br>with $i_{\text{start}}=5$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/editing_hand_web/minion_7.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Minion<br>with $i_{\text{start}}=1$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/editing_hand_web/minion_10.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Minion<br>with $i_{\text{start}}=10$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/editing_hand_web/minion_20.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Minion<br>with $i_{\text{start}}=20$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/editing_hand_web/minion.png" alt="Image 3" class="tiny">
+                    <figcaption>Original Minion</figcaption>
+                </figure>
+            </div>
+
+            <br>
+
+            <p>
+                Repeating this process on an image drawn from the web yields the following:
+            </p>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_A/sampling_loops/editing_hand_web/giraffe_1.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Giraffe<br>with $i_{\text{start}}=1$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/editing_hand_web/giraffe_3.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Giraffe<br>with $i_{\text{start}}=3$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/editing_hand_web/giraffe_5.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Giraffe<br>with $i_{\text{start}}=5$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/editing_hand_web/giraffe_7.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Giraffe<br>with $i_{\text{start}}=1$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/editing_hand_web/giraffe_10.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Giraffe<br>with $i_{\text{start}}=10$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/editing_hand_web/giraffe_20.png" alt="Image 3" class="tiny">
+                    <figcaption>SDEdit on Giraffe<br>with $i_{\text{start}}=20$</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/part_A/sampling_loops/editing_hand_web/giraffe.png" alt="Image 3" class="tiny">
+                    <figcaption>Original Giraffe</figcaption>
+                </figure>
+            </div>
+
+            <h5 class="section-subsubsubtitle">1.7.2 Inpainting</h5>
+            <h5 class="section-subsubsubtitle">1.7.3 Text-Conditional Image-to-Image Translation</h5>
             <h4 class="section-subsubtitle">1.8 Visual Anagrams</h4>
             <h4 class="section-subsubtitle">1.9 Hybrid Images</h4>
 
-
-
-            <h3 class="section-subtitle">Part 2: Bells & Whistles</h3>
-            <p>
-                ...
-            </p>
         </div>
 
         <br>
@@ -163,8 +814,29 @@
             <p>
                 ...
             </p>
-        </div>
 
+            <h3 class="section-subtitle">Part 1: Training a Single-Step Denoising UNet</h3>
+            <p>
+                ...
+            </p>
+
+            <h4 class="section-subsubtitle">1.1 Implementing the UNet</h4>
+            <h4 class="section-subsubtitle">1.2 Using the UNet to Train a Denoiser</h4>
+            <h5 class="section-subsubsubtitle">1.2.1 Training</h5>
+            <h5 class="section-subsubsubtitle">1.2.2 Out-of-Distribution Testing</h5>
+
+            <h3 class="section-subtitle">Part 2: Training a Diffusion Model</h3>
+            <p>
+                ...
+            </p>
+
+            <h4 class="section-subsubtitle">2.1 Adding Time Conditioning to UNet</h4>
+            <h4 class="section-subsubtitle">2.2 Training the UNet</h4>
+            <h4 class="section-subsubtitle">2.3 Sampling from the UNet</h4>
+            <h4 class="section-subsubtitle">2.4 Adding Class-Conditioning to UNet</h4>
+            <h4 class="section-subsubtitle">2.5 Sampling from the Class-Conditioned UNet</h4>
+        </div>
+        <br>
     </div>
 </body>
 </html>
