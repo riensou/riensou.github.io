@@ -199,7 +199,7 @@
 
                 Second, I implement a diffusion model from scratch
                 to generate handwritten digits by training on the <a href="https://en.wikipedia.org/wiki/MNIST_database">MNIST dataset</a>.
-                I utilize the <a href="https://arxiv.org/abs/1505.04597">U-Net</a> architecture to implement models capable of 
+                I utilize the <a href="https://arxiv.org/abs/1505.04597">UNet</a> architecture to implement models capable of 
                 one-step denoising and diffusion (with time and class conditiong). I also implement sampling with 
                 <a href="https://arxiv.org/abs/2207.12598">classifer-free guidance</a> (CFG) to improve the results of the 
                 generated images.
@@ -906,7 +906,8 @@
             <h5 class="section-subsubsubtitle">1.7.3 Text-Conditional Image-to-Image Translation</h5>
 
             <p>
-                ...
+                Next, we run the SDEdit algorithm again, but this time with prompts other than "a high quality
+                photo". The results along with their corresponding prompts are shown below:
             </p>
 
             <div class="image-grid">
@@ -1009,7 +1010,22 @@
             <h4 class="section-subsubtitle">1.8 Visual Anagrams</h4>
 
             <p>
-                ...
+                Next, we implement <a href="https://dangeng.github.io/visual_anagrams/">Visual Anagrams</a>,
+                creating optical optical illusions with diffusion models. Specifically, we create
+                images which appear like different things when flipped. To do this, we obtain noise
+                estimates for two prompts, but with one of them flipped.
+
+                <br><br>
+
+                That is, suppose we have two prompts $p_{up},p_{down}$. We obtain our noise estimate $\epsilon$ by 
+                the following:
+
+                $$\epsilon_{up}=\text{UNet}(x_t,t,p_{up})$$
+                $$\epsilon_{down}=\text{flip}(\text{UNet}(\text{flip}(x_t),t,p_{down}))$$
+                $$\epsilon=(\epsilon_{up}+\epsilon_{down}) / 2$$
+
+                Note that we can also run CFG on each of $\epsilon_{up},\epsilon_{down}$ to further 
+                improve the results. Implementing all of this yields the following results:
             </p>
 
             <br>
@@ -1120,7 +1136,21 @@
             <h4 class="section-subsubtitle">1.9 Hybrid Images</h4>
 
             <p>
-                ...
+                Using a similar idea, we can implement <a href="https://arxiv.org/abs/2404.11615">Factorized Diffusion</a>
+                to create hybrid images. That is, we can create a composite noise estimate by estimating the noise
+                of different prompts, then combining low frequencies of one noise with high frequencies of the other.
+
+                <br><br>
+
+                That is, suppose we have two prompts $p_{low},p_{high}$. For $f_{\text{lowpass}},f_{\text{highpass}}$
+                being lowpass and higpass filters respectively, we obtain our noise estimate $\epsilon$ by the following:
+
+                $$\epsilon_{low}=\text{UNet}(x_t,t,p_{low})$$
+                $$\epsilon_{high}=\text{UNet}(x_t,t,p_{high})$$
+                $$\epsilon=f_{\text{lowpass}}(\epsilon_{low})+f_{\text{highpass}}(\epsilon_{high})$$
+
+                As before, we can run CFG on $\epsilon_{low},\epsilon_{high}$ to further improve the results.
+                Implementing all of this yields the following results:
             </p>
             
             <br>
@@ -1229,7 +1259,6 @@
             </div>
         </div>
 
-        <br>
         <div class="section">
             <h2 class="section-title">Part B: Diffusion Models from Scratch!</h2>
             <p>
@@ -1238,118 +1267,270 @@
 
             <h3 class="section-subtitle">Part 1: Training a Single-Step Denoising UNet</h3>
             <p>
-                ...
+                We start by training a simple one-step denoiser. That is, given a noisy image
+                $z$, we train a model $D_\theta$ to map $z$ to a clean image $x$. We do so by 
+                optimizing over L2 loss:
+
+                $$L=\mathbb{E}_{z,x}\|D_\theta(z)-x\|^2$$
+
+                Note that at this stage, $D_\theta$ is not conditioned on time or class. It's only
+                goal is to denoise an image back onto the image manifold. Conditioning will come later.
             </p>
 
             <h4 class="section-subsubtitle">1.1 Implementing the UNet</h4>
+
+            <p>
+                We implement our denoiser model $D_\theta$ as a UNet, consisting of downsampling 
+                and upsampling blocks with skip connections. The following diagram showcases
+                the architecture of our model:
+            </p>
+
+            <br>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_B/part_1/unconditional_arch.png" alt="Image 3" class="long">
+                    <figcaption>Unconditional UNet</figcaption>
+                </figure>
+            </div>
+
+            <br>
+
+            <p>
+                The operations of the diagram above are further decomposed into simpler tensor
+                operations as follows:
+            </p>
+
+            <br>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_B/part_1/atomic_ops_new.png" alt="Image 3" class="long">
+                    <figcaption>Standard UNet Operations</figcaption>
+                </figure>
+            </div>
+
             <h4 class="section-subsubtitle">1.2 Using the UNet to Train a Denoiser</h4>
+
+            <p>
+                In order to train $D_\theta$, we must generate pairs $(z,x)$, where $x$ is sampled from
+                the MNIST dataset and $z$ is a noised version of $x$. For each training batch, we generate
+                $z$ from $x$ using the following noising process:
+
+                $$z=x+\sigma\epsilon,$$
+
+                where $\epsilon\sim\mathcal{N}(0,1)$ and $\sigma$ is chosen by us. The following
+                showcases the results of this noising process for different values of $\sigma$:
+            </p>
+
+            <br>
 
             <div class="image-grid">
                 <figure>
                     <img src="media/part_B/part_1/noisy_images.png" alt="Image 3" class="large">
-                    <figcaption>...</figcaption>
+                    <figcaption>Varying levels of noise on MNIST digits</figcaption>
                 </figure>
             </div>
 
             <h5 class="section-subsubsubtitle">1.2.1 Training</h5>
 
+            <p>
+                Now we are ready to train our denoiser $D_\theta$. We train on noisy images
+                corresponding to $\sigma=0.5$, use a batch size of $256$ for $5$ epochs, define 
+                our model with a hidden dimension $D=128$, and use the <a href="https://arxiv.org/abs/1412.6980">Adam optimizer</a>
+                with a fixed learning rate of $0.0001$. Doing so yields the following training loss curve:
+            </p>
+
+            <br>
+
             <div class="image-grid">
                 <figure>
                     <img src="media/part_B/part_1/training_losses.png" alt="Image 3" class="smooth">
-                    <figcaption>...</figcaption>
+                    <figcaption>Training Loss Curve for Denoiser $D_\theta(z)$</figcaption>
                 </figure>
             </div>
+
+            <br>
+
+            <p>
+                Visualizing the denoised results on the test set for the model after the first and fifth 
+                epoch, we see the following:
+            </p>
 
             <br>
 
             <div class="image-grid">
                 <figure>
                     <img src="media/part_B/part_1/output_1_5.png" alt="Image 3" class="large">
-                    <figcaption>...</figcaption>
+                    <figcaption>
+                        Results on digits from the test set after first and fifth epoch of training
+                    </figcaption>
                 </figure>
             </div>
 
             <h5 class="section-subsubsubtitle">1.2.2 Out-of-Distribution Testing</h5>
 
+            <p>
+                While our denoiser $D_\theta$ was trained on digits noised with $\sigma=0.5$, we 
+                can still test on other values of $\sigma$. The following showcases the denoiser
+                results on a test set digit with varying levels of noise applied to it.
+            </p>
+
             <div class="image-grid">
                 <figure>
                     <img src="media/part_B/part_1/out_of_dist.png" alt="Image 3" class="long">
-                    <figcaption>...</figcaption>
+                    <figcaption>Results on digit from the test set with varying noise levels</figcaption>
                 </figure>
             </div>
 
             <h3 class="section-subtitle">Part 2: Training a Diffusion Model</h3>
             <p>
-                ...
+                Now we move away from one-step denoising and towards diffusion. We utilize our UNet architecture 
+                from the previous section to implement <a href="https://arxiv.org/abs/2006.11239">DDPM</a>. We 
+                change our UNet to predict the added noise $\epsilon$ rather than the clean image $x$. Thus, our
+                loss becomes the following:
+
+                $$L=\mathbb{E}_{z,\epsilon}\|\epsilon_\theta(z)-\epsilon\|^2,$$
+
+                where $\epsilon_\theta$ is a UNet trained to predict noise. Since we are doing diffusion,
+                we will eventually want to sample pure noise $\epsilon\sim\mathcal{N}(0,1)$ and generate 
+                a realistic image $x$. However, as seen before, the capability of one-step denoising is
+                limited, so we instead focus on iterative denoising.
+
+                <br><br>
+
+                We use the following equation from before to generate noisy images $x_t$ from $x_0$
+                for some timestep $t\in\{0,1,\ldots,T\}$:
+
+                $$x_t=\sqrt{\bar{\alpha}_t}x_0+\sqrt{1-\bar{\alpha}_t}\epsilon,$$
+
+                where $\epsilon\sim\mathcal{N}(0,1)$. The derivation of $\bar{\alpha}$ is given in the DDPM
+                paper, but for now we just use the following simplified recipe:
+                <ul>
+                    <li>
+                        instantiate a list $\beta$ of length $T$ such that $\beta_0=0.0001$, $\beta_T=0.02$, and $\beta_t$
+                        is evenly spaced between the two for $t\in\{1,2,\ldots,T-1\}$.
+                    </li>
+                    <li>$\alpha_t=1-\beta_t$ for all $t$</li>
+                    <li>$\bar{\alpha}_t=\prod_{s=1}^t\alpha_t$, the cumulative product of $\alpha_s$ for $s\in\{1,2,\ldots,t\}$</li>
+                </ul>
+
+                Finally, we set $T=300$ and slightly modify our UNet architecture by conditioning on $t$. This gives us
+                our final objective:
+
+                $$L=\mathbb{E}_{x_0,t,\epsilon}\|\epsilon_\theta(x_0|t)-\epsilon\|^2$$
             </p>
 
             <h4 class="section-subsubtitle">2.1 Adding Time Conditioning to UNet</h4>
+
+            <p>
+                The following showcases the updated architecture, with conditioning on $t$:
+            </p>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_B/part_2/conditional_arch.png" alt="Image 3" class="long">
+                    <figcaption>Conditioned UNet</figcaption>
+                </figure>
+            </div>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/part_B/part_2/fc_long.png" alt="Image 3" class="smalllong">
+                    <figcaption>FCBlock for conditioning</figcaption>
+                </figure>
+            </div>
+
             <h4 class="section-subsubtitle">2.2 Training the UNet</h4>
+
+            <p>
+                Now we are ready to train our time-conditioned UNet, $\epsilon_\theta(x_t|t)$. We use
+                a batch size of $128$ for $20$ epochs, define our model with hidden dimension $D=64$,
+                and use the Adam optimizer with initial learning rate of $0.001$ and exponential learning
+                rate decay of $0.1^{0.05}$. Doing so yields the following training loss curve:
+            </p>
+
+            <br>
 
             <div class="image-grid">
                 <figure>
                     <img src="media/part_B/part_2/time_losses.png" alt="Image 3" class="smooth">
-                    <figcaption>...</figcaption>
+                    <figcaption>Training Loss Curve for Time-Conditioned UNet $\epsilon_\theta(x_t|t)$</figcaption>
                 </figure>
             </div>
 
             <h4 class="section-subsubtitle">2.3 Sampling from the UNet</h4>
 
+            Next, we can sample from our diffusion model just as we did in part A. This yields the following
+            for different epochs:
+
             <div class="image-grid">
                 <figure>
                     <img src="media/part_B/part_2/time_samples_1.png" alt="Image 3" class="smalllong">
-                    <figcaption>...</figcaption>
+                    <!-- <figcaption>Epoch 1</figcaption> -->
                 </figure>
                 <figure>
                     <img src="media/part_B/part_2/time_samples_5.png" alt="Image 3" class="smalllong">
-                    <figcaption>...</figcaption>
+                    <!-- <figcaption>Epoch 5</figcaption> -->
                 </figure>
                 <figure>
                     <img src="media/part_B/part_2/time_samples_10.png" alt="Image 3" class="smalllong">
-                    <figcaption>...</figcaption>
+                    <!-- <figcaption>Epoch 10</figcaption> -->
                 </figure>
                 <figure>
                     <img src="media/part_B/part_2/time_samples_20.png" alt="Image 3" class="smalllong">
-                    <figcaption>...</figcaption>
+                    <!-- <figcaption>Epoch 20</figcaption> -->
                 </figure>
             </div>
 
             <h4 class="section-subsubtitle">2.4 Adding Class-Conditioning to UNet</h4>
 
+            We can also add class conditioning to our model by further conditioning on the label during training.
+            During training, we occasionally drop our class conditioning in order to maintain the ability to unconditionally
+            generate images. The following is the training loss curve of our new UNet diffusion model, $\epsilon_\theta(x_t|t,c)$:
+
             <div class="image-grid">
                 <figure>
                     <img src="media/part_B/part_2/class_losses.png" alt="Image 3" class="smooth">
-                    <figcaption>...</figcaption>
+                    <figcaption>Training Loss Curve for Class-Conditioned UNet $\epsilon_\theta(x_t|t,c)$</figcaption>
                 </figure>
             </div>
 
             <h4 class="section-subsubtitle">2.5 Sampling from the Class-Conditioned UNet</h4>
 
+            Sampling from this model, now using CFG as described before, yields the following results:
+
             <div class="image-grid">
                 <figure>
                     <img src="media/part_B/part_2/class_samples_1.png" alt="Image 3" class="smalllong">
-                    <figcaption>...</figcaption>
+                    <!-- <figcaption>...</figcaption> -->
                 </figure>
                 <figure>
                     <img src="media/part_B/part_2/class_samples_5.png" alt="Image 3" class="smalllong">
-                    <figcaption>...</figcaption>
+                    <!-- <figcaption>...</figcaption> -->
                 </figure>
                 <figure>
                     <img src="media/part_B/part_2/class_samples_10.png" alt="Image 3" class="smalllong">
-                    <figcaption>...</figcaption>
+                    <!-- <figcaption>...</figcaption> -->
                 </figure>
                 <figure>
                     <img src="media/part_B/part_2/class_samples_20.png" alt="Image 3" class="smalllong">
-                    <figcaption>...</figcaption>
+                    <!-- <figcaption>...</figcaption> -->
                 </figure>
             </div>
+
+            <br>
+
+            <p>
+                Furthermore, we can visualize the iterative denoising process as follows:
+            </p>
 
             <br>
 
             <div class="image-grid">
                 <figure>
                     <img src="media/part_B/part_2/transformation.gif" alt="Image 3" class="long">
-                    <figcaption>...</figcaption>
+                    <!-- <figcaption></figcaption> -->
                 </figure>
             </div>
         </div>
