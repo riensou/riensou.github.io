@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS 180 Project 5: Fun With Diffusion Models!</title>
+    <style>
+        body {
+            background-color: #e0f4ff; /* Light purple for the sides */
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px; /* Adjust the width of your content */
+            margin: 0 auto; /* Center the content */
+            background-color: #ffffff; /* White background for the content */
+        }
+
+        header {
+            background-color: #003366; /* Darker purple for the header */
+            padding: 20px;
+            color: #ffffff; /* White text for the header */
+            text-align: center;
+            width: 100%; /* Ensure the header spans the full width */
+            box-sizing: border-box;
+        }
+
+        h1 {
+            margin: 0;
+        }
+
+        h2, h3 {
+            color: #000000; /* Black for headings */
+        }
+
+        .section {
+            text-align: left; /* Align section content to the left */
+            margin-bottom: 30px;
+            padding: 0 20px; /* Add some padding for better spacing */
+        }
+
+        .section-title {
+            text-align: center; /* Center-align the section title */
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .section-subtitle {
+            text-align: center; /* Center-align the section title */
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .section-subsubtitle {
+            text-align: center; /* Center-align the section title */
+            font-size: 1.25em;
+            margin-bottom: 10px;
+        }
+
+        .section-subsubsubtitle {
+            text-align: center; /* Center-align the section title */
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .image-grid {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .image-grid figure {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+        }
+
+        .image-grid img {
+            width: 200px;
+            height: 200px;
+            object-fit: contain;
+            margin: 5px 20px;
+        }
+
+        .image-grid img.smooth {
+            image-rendering: auto;
+            width: 500px;
+            height: 300px;
+        }
+
+        .image-grid img.tiny {
+            image-rendering: auto;
+            width: 140px;
+            height: 140px;
+            margin: 5px;
+        }
+
+        .image-grid img.small {
+            image-rendering: auto;
+            width: 125px;
+            height: 125px;
+        }
+
+        .image-grid img.medium {
+            image-rendering: auto;
+            width: 300px;
+            height: 300px;
+        }
+
+        .image-grid img.large {
+            width: 800px;
+            height: 600px;
+            image-rendering: auto;
+        }
+
+        .image-grid img.long {
+            width: 800px;
+            height: 150px;
+            image-rendering: auto;
+        }
+
+        .image-grid img.smalllong {
+            width: 500px;
+            height: 250px;
+            image-rendering: auto;
+        }
+
+        .image-grid figcaption {
+            font-size: 1em;
+            text-align: center;
+            max-width: 300px;
+            word-wrap: break-word;
+        }
+
+        .section-title {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .section-subtitle {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .section-subsubtitle {
+            font-size: 1.25em;
+            margin-bottom: 10px;
+        }
+
+        .section-subsubsubtitle {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+        a {
+        color: #3399ff; /* Link color */
+        text-decoration: none; /* Remove underline */
+        }
+
+        a:hover {
+            color: #0066cc; /* Change color on hover */
+        }
+    </style>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']] // Enable single-dollar signs for inline math
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+<body>
+    <header>
+        <h1>CS 180 Final Project: Neural Radiance Field!</h1><br>
+        Ryan Campbell
+    </header>
+    <div class="container">
+        <br>
+        <div class="section">
+            <p>
+                In this project, we implement and train a <a href="https://www.matthewtancik.com/nerf">Neural Radiance Field</a> (NeRF).
+                NeRFs are mappings $F:\{x,y,z,\theta,\phi\}\to\{r,g,b,\sigma\}$ that are used to represent a 3D space.
+                Before implementing NeRFs, we gain some intuition by implementing a Radiance Field in 2D, 
+                a mapping $F:\{u,v\}\to\{r,g,b\}$. In order to learn these mappings, we utilize machine learning techniques
+                with neural networks. 
+            </p>
+            <div class="image-grid">
+                <figure>
+                    <img src="media/nerf.png" alt="Image 1" class="smooth">
+                    <figcaption>NeRF: Neural Radiance Fields</figcaption>
+                </figure>
+            </div>
+
+            <h2 class="section-title">Part 1: Fit a Neural Field to a 2D Image</h2>
+
+            <p>
+                We start by attempting to learn reconstructions of the following images:
+            </p>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/fox.jpg" alt="Image 1" class="medium">
+                    <figcaption>Fox</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/benny.jpg" alt="Image 1" class="medium">
+                    <figcaption>Benny</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/ryan.jpeg" alt="Image 1" class="medium">
+                    <figcaption>Ryan</figcaption>
+                </figure>
+            </div>
+
+            <p>
+                In order to do so, we utilize a <a href="https://en.wikipedia.org/wiki/Multilayer_perceptron">Multilayer Perceptron</a>
+                (MLP) network with Sinusoidal Positional Encoding (PE) that takes in the 2D pixel coordinates, 
+                and output the 3D pixel colors. The following is the architecture that we implement:
+            </p>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/mlp.png" alt="Image 1" class="smooth">
+                </figure>
+            </div>
+
+            <p>
+                PE is an operation in which that you apply a series of sinusoidal functions to the input cooridnates
+                to expand its dimensionality. It is defined as follows:
+
+                $$PE(x, L)=\left[x,\sin(2^0\pi x),\cos(2^0\pi x),\sin(2^1\pi x),\cos(2^1\pi x),\ldots
+                \sin(2^{L-1}\pi x),\cos(2^{L-1}\pi x)\right]$$
+
+                In order to train our MLP, we implement a dataloader, which randomly samples $N$ pixels
+                each iteration of training. This dataloader provides the training loop with the $N\times 2$ coordinates
+                and $N\times 3$ colors which are the input and targets of the network respectively.
+                
+                <br><br>
+
+                Training with L=10, Adam with a learning rate of 1e-2, a batch size of 10k yields,
+                and on MSE loss yields the following training curves:
+            </p>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/fox_loss.png" alt="Image 1" class="medium">
+                    <figcaption>Fox Loss</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/benny_loss.png" alt="Image 1" class="medium">
+                    <figcaption>Benny Loss</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/ryan_loss.png" alt="Image 1" class="medium">
+                    <figcaption>Ryan Loss</figcaption>
+                </figure>
+            </div>
+
+            <p>
+                We also utilize <a href="https://en.wikipedia.org/wiki/Peak_signal-to-noise_ratio">
+                Peak Signal-to-Noise Ratio</a> (PSNR) as a metric for measuring the reconstruction quality of the images.
+                This is shown below:
+            </p>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/fox_psnr.png" alt="Image 1" class="medium">
+                    <figcaption>Fox PSNR</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/benny_psnr.png" alt="Image 1" class="medium">
+                    <figcaption>Benny PSNR</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/ryan_psnr.png" alt="Image 1" class="medium">
+                    <figcaption>Ryan PSNR</figcaption>
+                </figure>
+            </div>
+
+            <br><br>
+
+            <p>
+                Plotting the predicted images across iterations, we get the following results:
+            </p>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/fox_reconstructions.png" alt="Image 1" class="long">
+                </figure>
+                <figure>
+                    <img src="media/benny_reconstructions.png" alt="Image 1" class="long">
+                </figure>
+                <figure>
+                    <img src="media/ryan_reconstructions.png" alt="Image 1" class="long">
+                </figure>
+            </div>
+
+            <p>
+                [Bells & Whistles] We can also visualzie the training process by organizing the predicted images
+                into a gif.
+            </p>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/fox.gif" alt="Image 1" class="medium">
+                    <figcaption>Fox reconstruction over training</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/slow_benny.gif" alt="Image 1" class="medium">
+                    <figcaption>Benny reconstruction over training</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/slow_ryan.gif" alt="Image 1" class="medium">
+                    <figcaption>Ryan reconstruction over training</figcaption>
+                </figure>
+            </div>
+
+            <br><br>
+
+            <p>
+                Next, we try a different set of hyperparameters and see how it affects
+                the results. I tried a lower learning rate (5e-3) along with a higher
+                max frequency (L=20) for the PE. This lead to slightly improved results
+                on the Fox, as shown below. Notice the peak PSNR is higher than before.
+            </p>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/fox_loss_lr=5e-3_L=20.png" alt="Image 1" class="medium">
+                    <figcaption>Fox (learning_rate=5e-3, L=20) Loss</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/fox_psnr_lr=5e-3_L=20.png" alt="Image 1" class="medium">
+                    <figcaption>Fox (learning_rate=5e-3, L=20) PSNR</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/fox_reconstructions_lr=5e-3,L=20.png" alt="Image 1" class="long">
+                    <figcaption>Fox (learning_rate=5e-3, L=20) Reconstructions</figcaption>
+                </figure>
+            </div>
+
+            <br><br>
+
+            <p>
+                [Bells & Whistles] Interestingly, if we increase the resolution of our rendered images (say by some 
+                resolution factor $\alpha$), the quality of our image remains. I expected some artifacts
+                to show up along the lines of out-of-distribution inputs, but the learned reconstruction was able to successfully interpolate on the
+                unseen inputs.
+            </p>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/fox_10000_1.png" alt="Image 1" class="medium">
+                    <figcaption>Fox ($\alpha=1$)</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/fox_10000_1.5.png" alt="Image 1" class="medium">
+                    <figcaption>Fox ($\alpha=1.5$)</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/fox_10000_2.png" alt="Image 1" class="medium">
+                    <figcaption>Fox ($\alpha=2$)</figcaption>
+                </figure>
+            </div>
+
+            <h2 class="section-title">Part 2: Fit a Neural Radiance Field from Multi-view Images</h2>
+
+            <p>
+                Now that we are familiar with using a neural field to represent a image, we proceed by 
+                using a neural radiance field to represent a 3D space, through inverse rendering from 
+                multi-view calibrated images. For this part we are going to use the Lego scene from the 
+                <a href="https://arxiv.org/abs/2003.08934">original NeRF paper</a>, but with lower 
+                resolution images and preprocessed cameras.
+            </p>
+
+            <h3 class="section-subtitle">Part 2.1: Create Rays from Cameras</h3>
+
+            <p>
+                First, we implement functions for (1) camera to world coordinate conversion, (2) pixel to camera
+                coordinate conversion, and (3) pixel to ray. 
+                
+                <br><br> 
+                
+                To implement (1), we write a function that performs the following:
+
+                $$
+                \begin{bmatrix}
+                x_c \\
+                y_c \\
+                z_c \\
+                1
+                \end{bmatrix}
+                =
+                \begin{bmatrix}
+                \mathbf{R}_{3 \times 3} & \mathbf{t} \\
+                \mathbf{0}_{1 \times 3} & 1
+                \end{bmatrix}
+                \begin{bmatrix}
+                x_w \\
+                y_w \\
+                z_w \\
+                1
+                \end{bmatrix}
+                $$
+
+                To implement (2), we write a function that performs the following:
+
+                $$ s
+                \begin{bmatrix}
+                u \\
+                v \\
+                1 
+                \end{bmatrix}
+                =
+                \mathbf{K}
+                \begin{bmatrix}
+                x_c \\
+                y_c \\
+                1 
+                \end{bmatrix}
+                $$
+
+                To implement (3), we define a ray as an origin $\mathbf{r}_o\in\mathbb{R}^3$ and
+                a direction $\mathbf{r}_d\in\mathbb{R}^3$. In order to know $\left[\mathbf{r}_o,
+                \mathbf{r}_d\right]$ for each $(u,v)$, we can perform the following:
+
+                $$\mathbf{r}_o=-\mathbf{R}_{3 \times 3}^{-1}\mathbf{t}$$
+
+                $$\mathbf{r}_d=\frac{\mathbf{X}_{\mathbf{w}}-\mathbf{r}_o}{
+                    \|\mathbf{X}_{\mathbf{w}}-\mathbf{r}_o\|_2
+                }$$
+            </p>
+
+            <h3 class="section-subtitle">Part 2.2: Sampling</h3>
+
+            <p>
+                Now, we use the three functions we implemented in the previous part to allow for (1)
+                sampling rays from images and (2) sampling points along rays. 
+                
+                <br><br>
+                
+                In order to accomplish (1),
+                we flatten all pixels from all images and do a global sampling once to get N rays from all images.
+
+                <br><br>
+
+                To implement (2), we discritize each ray into samples that live in the 3D space. We do this 
+                by uniformly sampling along the ray, but during training we introduce small perturbations to
+                avoid overfitting.
+            </p>
+
+            <h3 class="section-subtitle">Part 2.3: Putting the Dataloading All Together</h3>
+
+            <p>
+                Next, we verify that our sampling is correct by writing a dataloader. We use <a 
+                href="https://viser.studio/latest/">viser</a> to visualize the cameras, rays, and samples in 3D.
+            </p>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/views.png" alt="Image 1" class="smooth">
+                </figure>
+            </div>
+
+            <h3 class="section-subtitle">Part 2.4: Neural Radiance Field</h3>
+
+            <p>
+                Below is the architecture that we implement. Notice that this MLP is noticeably deeper
+                than before. This is due to the fact that we are doing a more challenging task of optimizing 
+                a 3D representation rather than a 2D representation, so we need network with higher capacity.
+            </p>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/deep_mlp.png" alt="Image 1" class="smooth">
+                </figure>
+            </div>
+
+            <h3 class="section-subtitle">Part 2.5: Volume Rendering</h3>
+
+            <p>
+                Next we implement the volume rendering equation. The core volume rendering equation is as follows:
+
+                $$C(\mathbf{r})=\int_{t_n}^{t_f}T(t)\sigma(\mathbf{r}(t))\mathbf{c}(\mathbf{r}(t))dt,$$
+
+                where $T(t)=\exp\left(-\int_{t_n}^{t}\sigma(\mathbf{r}(s))ds\right)$. The discrete (and tractable)
+                approximation, which we implement, is as follows:
+
+                $$\hat{C}(\mathbf{r})=\sum_{i=1}^NT_i(1-\exp(-\sigma_i\delta_i))\mathbf{c}_i,$$
+
+                where $T_i=\exp\left(\sum_{j=1}^{i-1}\sigma_j\delta_j\right)$, $\mathbf{c}_i$ is the color returned
+                by the network at sample location $i$, $T_i$ is the probability a ray not termininating before sample
+                location $i$, and $1-\exp(-\sigma_i\delta_i)$ is the probability of terminating at sample location $i$.
+
+                <br><br>
+
+                Finally, we are ready to train our model. We use L1=20, L2=10 for the $x$ and $r_d$ PE respectively,
+                an Adam optimizer with a learning rate of 5e-4, and a batchsize of 10k rays per iteration. This yields the 
+                following loss and PSNR curves (training and validation):
+            </p>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/mse_loss.png" alt="Image 1" class="medium">
+                </figure>
+                <figure>
+                    <img src="media/psnr.png" alt="Image 1" class="medium">
+                </figure>
+            </div>
+
+            <p>
+                The following showcases predicted images on the validation set as the model trains:
+            </p>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/val0.png" alt="Image 1" class="long">
+                </figure>
+                <figure>
+                    <img src="media/val5.png" alt="Image 1" class="long">
+                </figure>
+                <figure>
+                    <img src="media/val9.png" alt="Image 1" class="long">
+                </figure>
+            </div>
+
+            <p>
+                Finally, we can render novel views, as shown below with spherical renderings of the lego
+                scene.
+            </p>
+
+            <div class="image-grid">
+                <figure>
+                    <img src="media/500.gif" alt="Image 1" class="medium">
+                    <figcaption>iteration 500</figcaption>
+                </figure>
+                <figure>
+                    <img src="media/2900.gif" alt="Image 1" class="medium">
+                    <figcaption>iteration 2900</figcaption>
+                </figure>
+            </div>
+
+            <br>
+    </div>
+</body>
+</html>
