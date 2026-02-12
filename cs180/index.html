@@ -3,59 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CS 180 Portfolio</title>
+    <title>CS 180: Computer Vision</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 20px;
+        :root {
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --berkeley-blue: #003262;
+            --text: #1f2937;
+            --text-muted: #6b7280;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --border: #e5e7eb;
         }
-        h1 {
-            color: #333;
-            text-align: center;
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        .header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 1.5rem;
+        }
+        .header-inner {
+            max-width: 720px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
         .back {
-            display: inline-block;
-            margin-bottom: 20px;
-            color: #007bff;
+            color: var(--accent);
             text-decoration: none;
+            font-weight: 500;
         }
         .back:hover {
             text-decoration: underline;
         }
+        .berkeley-seal {
+            width: 72px;
+            height: 72px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+        .main {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem;
+        }
+        .course-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        .course-header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin: 0 0 0.5rem 0;
+            color: var(--berkeley-blue);
+        }
+        .course-header p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+        .project-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
         a.project-link {
-            display: inline-block;
-            margin: 20px auto;
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
+            display: block;
+            padding: 1rem 1.25rem;
+            background: var(--card-bg);
+            color: var(--text);
             text-decoration: none;
-            font-size: 18px;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
+            font-weight: 500;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
         a.project-link:hover {
-            background-color: #0056b3;
+            border-color: var(--accent);
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.12);
         }
-        .container {
-            text-align: center;
-            max-width: 600px;
-            margin: 0 auto;
+        a.project-link span {
+            color: var(--text-muted);
+            font-weight: 400;
+            font-size: 0.9rem;
+        }
+        @media (max-width: 640px) {
+            .main {
+                padding: 1.5rem 1rem;
+            }
+            .course-header h1 {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <a href="../index.html" class="back">← Back to home</a>
-        <h1>CS 180: Computational Photography</h1>
-        <p>Course project writeups and demos.</p>
-        <a href="../1/index.html" class="project-link">Project 1: Images of the Russian Empire</a><br>
-        <a href="../2/index.html" class="project-link">Project 2: Fun with Filters and Frequencies!</a><br>
-        <a href="../3/index.html" class="project-link">Project 3: Face Morphing</a><br>
-        <a href="../4/index.html" class="project-link">Project 4: [Auto]Stitching Photo Mosaics</a><br>
-        <a href="../5/index.html" class="project-link">Project 5: Fun With Diffusion Models!</a><br>
-        <a href="../final/index.html" class="project-link">Final Project: Neural Radiance Field!</a><br>
-    </div>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="back">← Back to home</a>
+            <img
+                class="berkeley-seal"
+                src="https://upload.wikimedia.org/wikipedia/commons/a/a1/Seal_of_University_of_California%2C_Berkeley.svg"
+                alt="UC Berkeley"
+                width="72"
+                height="72"
+            >
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="course-header">
+            <h1>CS 180: Computer Vision</h1>
+            <p>Course project writeups and demos.</p>
+        </div>
+
+        <div class="project-list">
+            <a href="/cs180/1/index.html" class="project-link">Project 1: Images of the Russian Empire</a>
+            <a href="/cs180/2/index.html" class="project-link">Project 2: Fun with Filters and Frequencies!</a>
+            <a href="/cs180/3/index.html" class="project-link">Project 3: Face Morphing</a>
+            <a href="/cs180/4/index.html" class="project-link">Project 4: [Auto]Stitching Photo Mosaics</a>
+            <a href="/cs180/5/index.html" class="project-link">Project 5: Fun With Diffusion Models!</a>
+            <a href="/cs180/final/index.html" class="project-link">Final Project: Neural Radiance Field!</a>
+        </div>
+    </main>
 </body>
 </html>
