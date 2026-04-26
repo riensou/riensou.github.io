@@ -4,260 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ryan Campbell | EECS @ UC Berkeley</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --accent: #2d6a2d;
-            --accent-hover: #1d4d1d;
-            --text: #1a1a1a;
-            --text-muted: #5a5a5a;
-            --bg: #ffffff;
-            --bg-card: #ffffff;
-            --border: #e0e0e0;
-            --border-accent: #b8d4b8;
-            --shadow: 0 1px 3px rgba(0,0,0,0.06);
-            --sidebar-width: 260px;
-        }
-        body.dark-mode {
-            --accent: #5cb85c;
-            --accent-hover: #7dd67d;
-            --text: #e8e8e8;
-            --text-muted: #b0b0b0;
-            --bg: #1a1a1a;
-            --bg-card: #252525;
-            --border: #404040;
-            --border-accent: #3d5c3d;
-            --shadow: 0 1px 3px rgba(0,0,0,0.3);
-        }
-        * { box-sizing: border-box; }
-        html { overflow-x: hidden; }
-        body {
-            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            color: var(--text);
-            background: var(--bg);
-            margin: 0;
-            padding: 0;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-        .layout {
-            display: flex;
-            min-height: 100vh;
-            padding-top: 3rem;
-        }
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 3rem;
-            bottom: 0;
-            width: var(--sidebar-width);
-            padding: 1.25rem 1.25rem;
-            border-right: 1px solid var(--border);
-            background: var(--bg);
-        }
-        .sidebar-photo {
-            width: 100%;
-            max-width: 220px;
-            height: auto;
-            aspect-ratio: 1;
-            object-fit: cover;
-            display: block;
-            margin-bottom: 1rem;
-            border: 3px solid var(--accent-hover);
-        }
-        .sidebar h1 {
-            font-size: 1.35rem;
-            font-weight: 700;
-            margin: 0 0 0.35rem 0;
-            color: var(--text);
-            letter-spacing: -0.02em;
-        }
-        .sidebar-title {
-            font-size: 0.9rem;
-            color: var(--text);
-            margin: 0 0 0.2rem 0;
-        }
-        .sidebar-subtitle {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin: 0 0 1rem 0;
-        }
-        .sidebar-photo-music {
-            display: none;
-            width: 100%;
-            max-width: 220px;
-            height: auto;
-            aspect-ratio: 1;
-            object-fit: cover;
-            margin-bottom: 1rem;
-            border: 3px solid var(--accent-hover);
-        }
-        .sidebar-music-blurb {
-            display: none;
-        }
-        .sidebar.sidebar--music .sidebar-photo,
-        .sidebar.sidebar--music .sidebar-default-blurb {
-            display: none;
-        }
-        .sidebar.sidebar--music .sidebar-photo-music,
-        .sidebar.sidebar--music .sidebar-music-blurb {
-            display: block;
-        }
-        .top-nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1.25rem;
-            padding: 0 1.5rem;
-            border-bottom: 1px solid var(--border);
-            background: var(--bg);
-            z-index: 10;
-        }
-        .top-nav-spacer { flex: 1; min-width: 0; }
-        .dark-mode-btn {
-            position: absolute;
-            right: 1.5rem;
-            padding: 0.35rem 0.65rem;
-            font-size: 0.8rem;
-            font-family: inherit;
-            color: var(--accent);
-            background: transparent;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            cursor: pointer;
-            transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
-        }
-        .dark-mode-btn:hover {
-            color: var(--accent-hover);
-            border-color: var(--accent);
-        }
-        .nav {
-            display: flex;
-            flex-direction: row;
-            gap: 1.25rem;
-        }
-        .nav a {
-            color: var(--accent);
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.15s ease;
-        }
-        .nav a:hover,
-        .nav a.active {
-            color: var(--accent-hover);
-        }
-        .main {
-            margin-left: var(--sidebar-width);
-            flex: 1;
-            padding: 1.5rem 2rem 1.5rem 1.5rem;
-            min-height: calc(100vh - 3rem);
-        }
-        .panel {
-            display: none;
-        }
-        .panel.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        .panel-content {
-            max-width: none;
-        }
-        .panel#projects-panel .panel-content,
-        .panel#research-panel .panel-content {
-            max-height: calc(100vh - 4rem);
-            overflow-y: auto;
-        }
-        h2 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin: 0 0 1rem 0;
-            color: var(--text);
-        }
-        p { margin: 0 0 0.75rem 0; }
-        a { color: var(--accent); text-decoration: none; transition: color 0.15s ease; }
-        a:hover { color: var(--accent-hover); text-decoration: underline; }
-        .experience-item, .education-item {
-            margin-bottom: 1rem;
-            padding: 1rem 1.15rem;
-            background: var(--bg-card);
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-        }
-        .experience-item:last-child, .education-item:last-child { margin-bottom: 0; }
-        .experience-item h3, .education-item h3 { font-size: 1rem; font-weight: 600; margin: 0 0 0.25rem 0; }
-        .meta { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.35rem; }
-        .education-compact p { margin-bottom: 0.4rem; }
-        .education-compact p:last-child { margin-bottom: 0; }
-        .education-coursework { font-size: 0.9rem; color: var(--text-muted); }
-        .project-card {
-            display: flex;
-            gap: 1.25rem;
-            align-items: flex-start;
-            margin-bottom: 1rem;
-            padding: 1rem 1.2rem;
-            background: var(--bg-card);
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-        }
-        .project-card:last-child { margin-bottom: 0; }
-        .project-card h3 { font-size: 1rem; font-weight: 600; margin: 0 0 0.25rem 0; }
-        .project-card p { font-size: 0.88rem; color: var(--text-muted); margin: 0; }
-        .project-card a { font-weight: 500; word-wrap: break-word; overflow-wrap: break-word; }
-        .project-card-img {
-            width: 160px;
-            min-width: 160px;
-            height: 120px;
-            object-fit: contain;
-            border-radius: 6px;
-            background: #fff;
-        }
-        .project-card-body { flex: 1; min-width: 0; }
-        .contact-email { font-family: ui-monospace, monospace; font-size: 0.95rem; margin-bottom: 0.75rem; }
-        .contact-links { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-        .contact-links a {
-            display: inline-block;
-            padding: 0.45rem 0.9rem;
-            background: var(--accent);
-            color: white;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-        .contact-links a:hover { background: var(--accent-hover); text-decoration: none; }
-        @media (max-width: 768px) {
-            .top-nav { height: auto; min-height: 3rem; padding: 0.5rem 1rem; }
-            .nav { flex-wrap: wrap; }
-            .layout { flex-direction: column; }
-            .sidebar {
-                position: static;
-                width: 100%;
-                margin-top: 0;
-                border-right: none;
-                border-bottom: 1px solid var(--border);
-                display: flex;
-                flex-wrap: wrap;
-                align-items: center;
-                gap: 1rem;
-                padding: 1rem;
-            }
-            .sidebar-photo { margin-bottom: 0; max-width: 80px; }
-            .sidebar-photo-music { margin-bottom: 0; max-width: 80px; }
-            .main { margin-left: 0; margin-top: 0; padding: 1rem; min-height: 100vh; }
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header class="top-nav">
@@ -278,24 +25,22 @@
             <h1>Ryan Campbell</h1>
             <div class="sidebar-default-blurb">
                 <p class="sidebar-title">Graduate Student, EECS Department, UC Berkeley.</p>
-                <p class="sidebar-subtitle">San Francisco Bay Area · Aspiring robotics researcher; applied ML and deep RL.</p>
+                <p class="sidebar-subtitle">San Francisco Bay Area · Robotics researcher; applied ML and deep RL.</p>
             </div>
             <div class="sidebar-music-blurb">
                 <p class="sidebar-title">Jazz Musician · Bass & Piano.</p>
-                <p class="sidebar-subtitle">San Francisco Bay Area · Composer, Performer, Instructor, and co-founder of Frankly Martini.</p>
+                <p class="sidebar-subtitle">San Francisco Bay Area · Composer, Performer, Instructor</p>
             </div>
         </aside>
         <main class="main">
             <div id="about-panel" class="panel active">
                 <div class="panel-content">
-                    <h2>About</h2>
-                    <p>I am a graduate student in Electrical Engineering and Computer Sciences (EECS) at UC Berkeley, with a focus on reinforcement learning and robotics. I am currently a Graduate Research Assistant at Berkeley Artificial Intelligence Research (BAIR), where I work with <a href="https://www2.eecs.berkeley.edu/Faculty/Homepages/zakhor.html" target="_blank" rel="noopener">Professor Avideh Zakhor</a> on robot learning for locomotion, manipulation, and real-world automation.</p>
-                    <p>I received my B.A. in Mathematics and Computer Science from Berkeley and am now pursuing an M.S. in EECS. My background includes coursework and project work in computer vision, deep reinforcement learning, machine learning, robotics, and related areas. I am actively seeking research and industry opportunities in robotics, machine learning, and applied AI.</p>
+                    <p>I am a graduate student in Electrical Engineering and Computer Sciences (EECS) at UC Berkeley, with a focus on reinforcement learning and robotics. I work in Berkeley Artificial Intelligence Research (BAIR) with my advisor <a href="https://www2.eecs.berkeley.edu/Faculty/Homepages/zakhor.html" target="_blank" rel="noopener">Avideh Zakhor</a> on robot learning for locomotion, manipulation, and real-world automation.</p>
+                    <p>I received my B.A. in Mathematics and Computer Science from Berkeley and am now pursuing an M.S. in EECS. My background is in computer vision, deep reinforcement learning, machine learning, robotics, and related areas. I am actively seeking research and industry opportunities in robotics, machine learning, and applied AI.</p>
                 </div>
             </div>
             <div id="experience-panel" class="panel">
                 <div class="panel-content">
-                    <h2>Experience</h2>
                     <div class="experience-item">
                         <h3>Graduate Research Assistant</h3>
                         <div class="meta">Berkeley Artificial Intelligence Research (BAIR) · June 2025 – Present</div>
@@ -315,7 +60,7 @@
             </div>
             <div id="research-panel" class="panel">
                 <div class="panel-content">
-                    <h2>Research</h2>
+                    <!--
                     <div class="project-card">
                         <img class="project-card-img" src="assets/unitree-g1.png" alt="Unitree G1 Humanoid Robot">
                         <div class="project-card-body">
@@ -332,6 +77,7 @@
                             <p>Applied deep reinforcement learning to a real-world tracked robot to automate vacuuming and sealing American attics. ROS2, Gazebo, PPO, CNN-LSTM policy for autonomous navigation.</p>
                         </div>
                     </div>
+                    -->
                     <div class="project-card">
                         <img class="project-card-img" src="assets/icl-architecture.png" alt="ICL architecture">
                         <div class="project-card-body">
@@ -360,7 +106,6 @@
             </div>
             <div id="projects-panel" class="panel">
                 <div class="panel-content">
-                    <h2>Projects</h2>
                     <div class="project-card">
                         <img class="project-card-img" src="assets/muon-update-rules.png" alt="Update rules: SGD, Muon, and Schatten norm">
                         <div class="project-card-body">
@@ -389,6 +134,7 @@
                             <p>Robotics project using a Sawyer collaborative arm for object manipulation, with computer vision for detecting colored blocks and ArUco markers. Team project at Berkeley.</p>
                         </div>
                     </div>
+                    <!--
                     <div class="project-card">
                         <img class="project-card-img" src="assets/wheretoeat-chatbot.png" alt="WhereToEat Chatbot interface">
                         <div class="project-card-body">
@@ -396,6 +142,7 @@
                             <p>AI chatbot built with a team of 4 at the Cal Hacks AI Hackathon to help with restaurant selection. Next.js frontend (deployed on Vercel), Python backend using OpenAI and Google Maps APIs.</p>
                         </div>
                     </div>
+                    -->
                     <div class="project-card">
                         <img class="project-card-img" src="assets/cot-sample-complexity.png" alt="Chain-of-Thought autoregressive process">
                         <div class="project-card-body">
@@ -414,74 +161,44 @@
             </div>
             <div id="music-panel" class="panel">
                 <div class="panel-content">
-                    <h2>Music</h2>
-                    <p>I am a jazz musician who plays bass and piano. I write and record my own music, and I also perform with <strong>Frankly Martini</strong>, a 7-piece jazz fusion band I co-founded with fellow musicians from Berkeley. Our album <em>Wakey Wakey</em> is out now. I also play in <strong>The Fabric</strong>, a 4-piece indie rock band.</p>
-                    <p>Check out my personal <a href="https://open.spotify.com/artist/4scuHOBOXqB0H65a2JUhHU?si=zZ77l6MESqekNp6XnVcaoA" target="_blank" rel="noopener">Spotify</a>, Frankly Martini on <a href="https://open.spotify.com/artist/1klziV4NZrkfjzVvyCihuS?si=lS34GwKESPCq4j3ACaNfzg" target="_blank" rel="noopener">Spotify</a> and <a href="https://www.instagram.com/franklymartini/" target="_blank" rel="noopener">Instagram</a>, and The Fabric on <a href="https://www.instagram.com/thefabricofficial/" target="_blank" rel="noopener">Instagram</a>.</p>
-                    <p>I've studied through <a href="https://ucjazz.berkeley.edu/" target="_blank" rel="noopener">UC Jazz</a> with Frank Martin, Ted Moore, and Dan Zinn. I've also taken private lessons on bass with Daniel Lucca Parenti and on piano with Joan Cifarelli. I teach private lessons and lead my own ensemble in the UC Jazz program.</p>
+                    <p>I play jazz bass and piano, write and record my own music, and perform with a few groups in the Bay Area.</p>                        
+                    <p>Check out my personal artist <a href="https://open.spotify.com/artist/4scuHOBOXqB0H65a2JUhHU?si=zZ77l6MESqekNp6XnVcaoA" target="_blank" rel="noopener">Spotify</a>, <strong>Frankly Martini</strong> on <a href="https://open.spotify.com/artist/1klziV4NZrkfjzVvyCihuS?si=lS34GwKESPCq4j3ACaNfzg" target="_blank" rel="noopener">Spotify</a> and <a href="https://www.instagram.com/franklymartini/" target="_blank" rel="noopener">Instagram</a>, and <strong>The Fabric</strong> on <a href="https://www.instagram.com/thefabricofficial/" target="_blank" rel="noopener">Instagram</a>.</p>
+                    <p>During my time at UC Berkeley, I've studied in <a href="https://ucjazz.berkeley.edu/" target="_blank" rel="noopener">UC Jazz</a> with Frank Martin, Ted Moore, and Dan Zinn. I've also taken private lessons on bass with Daniel Lucca Parenti and on piano with Joan Cifarelli. I teach private lessons and lead my own ensemble in the UC Jazz program.</p>
                 </div>
             </div>
             <div id="contact-panel" class="panel">
                 <div class="panel-content">
-                    <h2>Contact</h2>
-                    <p>Reach out via the links below.</p>
                     <p class="contact-email">ryancampbell [at] berkeley [dot] edu</p>
-                    <div class="contact-links">
-                        <a href="https://scholar.google.com/citations?user=GxvmqCAAAAAJ&hl=en" target="_blank" rel="noopener">Google Scholar</a>
-                        <a href="https://github.com/riensou" target="_blank" rel="noopener">GitHub</a>
-                        <a href="https://www.linkedin.com/in/ryancampbell24/" target="_blank" rel="noopener">LinkedIn</a>
-                    </div>
+                    <p class="contact-row"><span class="contact-key">scholar:</span>  <a href="https://scholar.google.com/citations?user=GxvmqCAAAAAJ&hl=en">scholar.google.com/citations?user=GxvmqCAAAAAJ</a></p>
+                    <p class="contact-row"><span class="contact-key">github:</span>   <a href="https://github.com/riensou">github.com/riensou</a></p>
+                    <p class="contact-row"><span class="contact-key">linkedin:</span> <a href="https://www.linkedin.com/in/ryancampbell24/">linkedin.com/in/ryancampbell24</a></p>
                 </div>
             </div>
         </main>
     </div>
-    <script>
-        (function() {
-            var panels = document.querySelectorAll('.main .panel');
-            var links = document.querySelectorAll('.nav-link');
-            var sidebar = document.getElementById('sidebar');
-            function show(sectionId) {
-                var id = sectionId + '-panel';
-                panels.forEach(function(p) {
-                    p.classList.toggle('active', p.id === id);
-                });
-                links.forEach(function(a) {
-                    a.classList.toggle('active', a.getAttribute('data-section') === sectionId);
-                });
-                if (sidebar) {
-                    sidebar.classList.toggle('sidebar--music', sectionId === 'music');
-                }
-                if (history.replaceState) history.replaceState(null, '', '#' + sectionId);
-            }
-            function getSection() {
-                var hash = (window.location.hash || '#about').slice(1);
-                return hash && document.getElementById(hash + '-panel') ? hash : 'about';
-            }
-            links.forEach(function(a) {
-                a.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    show(a.getAttribute('data-section'));
-                });
-            });
-            window.addEventListener('hashchange', function() { show(getSection()); });
-            show(getSection());
-
-            var darkBtn = document.getElementById('dark-mode-btn');
-            var DARK_KEY = 'riensou-dark-mode';
-            function setDarkMode(on) {
-                document.body.classList.toggle('dark-mode', on);
-                if (darkBtn) darkBtn.textContent = on ? 'Light' : 'Dark';
-                try { localStorage.setItem(DARK_KEY, on ? '1' : '0'); } catch (e) {}
-            }
-            if (darkBtn) {
-                darkBtn.addEventListener('click', function() {
-                    setDarkMode(!document.body.classList.contains('dark-mode'));
-                });
-            }
-            try {
-                if (localStorage.getItem(DARK_KEY) === '1') setDarkMode(true);
-                else setDarkMode(false);
-            } catch (e) {}
-        })();
-    </script>
+    <div id="vim-status" class="vim-status hidden"></div>
+    <div id="vim-help" class="vim-help hidden">
+        <div class="vim-help-inner">
+            <h3>vim keys</h3>
+<pre>h  l  ← →         char left / right
+j  k  ↓ ↑         line down / up
+w  b  e           next word / prev word / word end
+0  $              line start / end
+gg  G             top / bottom of section
+Ctrl-d  Ctrl-u    half page down / up
+Ctrl-f  Ctrl-b    full page down / up
+f{c} F{c}         find char forward / back on line
+t{c} T{c}         till char forward / back on line
+;  ,              repeat last find / reverse
+/pattern          search within section
+n  N              next / prev match
+:about :experience :research :projects :music :contact
+:dark  :light     toggle theme
+:help  ?          this overlay
+Esc               cancel / back to nav</pre>
+            <p class="vim-help-close">click or press any key to close</p>
+        </div>
+    </div>
+    <script src="app.js" defer></script>
 </body>
 </html>

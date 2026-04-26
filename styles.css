@@ -1,0 +1,318 @@
+:root {
+    --accent: #2d6a2d;
+    --accent-hover: #1d4d1d;
+    --text: #1a1a1a;
+    --text-muted: #5a5a5a;
+    --bg: #ffffff;
+    --bg-card: #ffffff;
+    --border: #e0e0e0;
+    --border-accent: #b8d4b8;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06);
+    --sidebar-width: 240px;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+body.dark-mode {
+    --accent: #5cb85c;
+    --accent-hover: #7dd67d;
+    --text: #e8e8e8;
+    --text-muted: #b0b0b0;
+    --bg: #1a1a1a;
+    --bg-card: #252525;
+    --border: #404040;
+    --border-accent: #3d5c3d;
+    --shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+* { box-sizing: border-box; scrollbar-width: none; -ms-overflow-style: none; }
+*::-webkit-scrollbar { display: none; }
+html { overflow-x: hidden; }
+body {
+    font-family: var(--mono);
+    color: var(--text);
+    background: var(--bg);
+    margin: 0;
+    padding: 0;
+    line-height: 1.55;
+    font-size: 0.875rem;
+    overflow-x: hidden;
+}
+.layout {
+    display: flex;
+    min-height: 100vh;
+    padding-top: 2.5rem;
+}
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 2.5rem;
+    bottom: 0;
+    width: var(--sidebar-width);
+    padding: 1.25rem 1.25rem;
+    border-right: 1px solid var(--border);
+    background: var(--bg);
+}
+.sidebar-photo {
+    width: 100%;
+    max-width: 180px;
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+    display: block;
+    margin-bottom: 0.8rem;
+    border: none;
+}
+.sidebar h1 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 0 0 0.4rem 0;
+    color: var(--text);
+    letter-spacing: 0;
+}
+.sidebar-title {
+    font-size: 0.8rem;
+    color: var(--text);
+    margin: 0 0 0.25rem 0;
+}
+.sidebar-subtitle {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin: 0 0 1rem 0;
+}
+.sidebar-photo-music {
+    display: none;
+    width: 100%;
+    max-width: 180px;
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+    margin-bottom: 0.8rem;
+    border: none;
+}
+.sidebar-music-blurb {
+    display: none;
+}
+.sidebar.sidebar--music .sidebar-photo,
+.sidebar.sidebar--music .sidebar-default-blurb {
+    display: none;
+}
+.sidebar.sidebar--music .sidebar-photo-music,
+.sidebar.sidebar--music .sidebar-music-blurb {
+    display: block;
+}
+.top-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0 1rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    z-index: 10;
+}
+.top-nav-spacer { flex: 1; min-width: 0; }
+.dark-mode-btn {
+    position: absolute;
+    right: 1rem;
+    padding: 0;
+    font-size: 0.8rem;
+    font-family: inherit;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: color 0.15s ease;
+}
+.dark-mode-btn:hover {
+    color: var(--accent);
+}
+.nav {
+    display: flex;
+    flex-direction: row;
+    gap: 0.3rem;
+    font-size: 0.8rem;
+}
+.nav a {
+    color: var(--accent);
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+.nav a::before { content: "["; color: var(--text-muted); }
+.nav a::after { content: "]"; color: var(--text-muted); }
+.nav a:hover,
+.nav a.active {
+    color: var(--accent-hover);
+}
+.nav a.active {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+.ch.cursor-on {
+    background: var(--accent);
+    color: var(--bg);
+}
+.ch.search-match {
+    background: rgba(255, 200, 0, 0.35);
+}
+body.dark-mode .ch.search-match {
+    background: rgba(255, 200, 0, 0.25);
+}
+.vim-status {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 0.3rem 1rem;
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.85rem;
+    color: var(--text);
+    z-index: 20;
+    white-space: pre;
+}
+.vim-status.hidden { display: none; }
+.vim-status .vs-prefix { color: var(--accent); }
+.vim-status .vs-caret {
+    display: inline-block;
+    width: 0.5ch;
+    background: var(--text);
+    color: var(--bg);
+    animation: vimBlink 1s steps(2, start) infinite;
+}
+@keyframes vimBlink { to { visibility: hidden; } }
+.vim-help {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.vim-help.hidden { display: none; }
+.vim-help-inner {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 1.25rem 1.5rem;
+    max-width: 44rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.8rem;
+    color: var(--text);
+}
+.vim-help h3 {
+    margin: 0 0 0.8rem;
+    font-family: inherit;
+    font-size: 0.95rem;
+    color: var(--accent);
+}
+.vim-help pre { margin: 0 0 0.9rem; white-space: pre-wrap; }
+.vim-help-close { text-align: right; font-size: 0.72rem; color: var(--text-muted); margin: 0; }
+.main {
+    margin-left: var(--sidebar-width);
+    flex: 1;
+    padding: 1.5rem 1.75rem 3rem 1.5rem;
+    min-height: calc(100vh - 2.5rem);
+}
+.panel { display: none; }
+.panel.active { display: block; }
+.panel-content { max-width: 64rem; }
+h2 {
+    font-size: 0.95rem;
+    font-weight: 400;
+    margin: 0 0 1.2rem 0;
+    color: var(--accent);
+    text-transform: lowercase;
+}
+p { margin: 0 0 0.8rem 0; }
+a { color: var(--accent); text-decoration: none; transition: color 0.15s ease; }
+a:hover { color: var(--accent-hover); text-decoration: underline; }
+.experience-item, .education-item {
+    margin-bottom: 1.3rem;
+    padding: 0;
+    background: transparent;
+    border: none;
+}
+.experience-item:last-child, .education-item:last-child { margin-bottom: 0; }
+.experience-item h3, .education-item h3 {
+    font-size: 0.88rem;
+    font-weight: 700;
+    margin: 0 0 0.2rem 0;
+}
+.meta {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 0.35rem;
+}
+.meta-prefix { color: var(--text-muted); }
+.education-compact p { margin-bottom: 0.4rem; }
+.education-compact p:last-child { margin-bottom: 0; }
+.education-coursework { font-size: 0.85rem; color: var(--text-muted); }
+.project-card {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    margin-bottom: 1.4rem;
+    padding: 0;
+    background: transparent;
+    border: none;
+}
+.project-card:last-child { margin-bottom: 0; }
+.project-card h3 {
+    font-size: 0.88rem;
+    font-weight: 700;
+    margin: 0 0 0.2rem 0;
+}
+.project-card p { font-size: 0.82rem; color: var(--text-muted); margin: 0; }
+.project-card a { font-weight: 400; word-wrap: break-word; overflow-wrap: break-word; }
+.project-card-img {
+    width: 120px;
+    min-width: 120px;
+    height: 90px;
+    object-fit: contain;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+}
+.project-card-body { flex: 1; min-width: 0; }
+.contact-email {
+    font-family: inherit;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+}
+.contact-row { margin-bottom: 0.3rem; font-size: 0.875rem; }
+.contact-key { color: var(--text-muted); white-space: pre; }
+.contact-links { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.contact-links a {
+    display: inline-block;
+    padding: 0;
+    background: transparent;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 400;
+}
+.contact-links a:hover { background: transparent; color: var(--accent-hover); text-decoration: underline; }
+@media (max-width: 768px) {
+    .top-nav { height: auto; min-height: 2.5rem; padding: 0.5rem 1rem; }
+    .nav { flex-wrap: wrap; }
+    .layout { flex-direction: column; }
+    .sidebar {
+        position: static;
+        width: 100%;
+        margin-top: 0;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    .sidebar-photo { margin-bottom: 0; max-width: 64px; }
+    .sidebar-photo-music { margin-bottom: 0; max-width: 64px; }
+    .main { margin-left: 0; margin-top: 0; padding: 1rem; min-height: 100vh; }
+    .project-card-img { width: 80px; min-width: 80px; height: 60px; }
+}
