@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <script>try { if (localStorage.getItem('riensou-theme') !== 'light') document.body.classList.add('dark-mode'); } catch (e) {}</script>
     <header class="top-nav">
             <nav class="nav">
             <a href="#about" class="nav-link active" data-section="about">about</a>
@@ -19,7 +20,7 @@
             <a href="#music" class="nav-link" data-section="music">music</a>
             <a href="#contact" class="nav-link" data-section="contact">contact</a>
         </nav>
-        <button type="button" class="dark-mode-btn" id="dark-mode-btn" aria-label="Toggle dark mode">Dark</button>
+        <button type="button" class="dark-mode-btn" id="dark-mode-btn" aria-label="Toggle dark mode">Light</button>
     </header>
     <div class="layout">
         <aside class="sidebar" id="sidebar">

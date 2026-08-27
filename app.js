@@ -42,19 +42,19 @@
     });
 
     var darkBtn = document.getElementById('dark-mode-btn');
-    var DARK_KEY = 'riensou-dark-mode';
-    function setDarkMode(on) {
-        document.body.classList.toggle('dark-mode', on);
-        if (darkBtn) darkBtn.textContent = on ? 'Light' : 'Dark';
-        try { localStorage.setItem(DARK_KEY, on ? '1' : '0'); } catch (e) {}
+    var THEME_KEY = 'riensou-theme';
+    function applyTheme(dark) {
+        document.body.classList.toggle('dark-mode', dark);
+        if (darkBtn) darkBtn.textContent = dark ? 'Light' : 'Dark';
     }
+    var saved = null;
+    try { saved = localStorage.getItem(THEME_KEY); } catch (e) {}
+    applyTheme(saved !== 'light');
     if (darkBtn) {
         darkBtn.addEventListener('click', function() {
-            setDarkMode(!document.body.classList.contains('dark-mode'));
+            var dark = !document.body.classList.contains('dark-mode');
+            applyTheme(dark);
+            try { localStorage.setItem(THEME_KEY, dark ? 'dark' : 'light'); } catch (e) {}
         });
     }
-    try {
-        if (localStorage.getItem(DARK_KEY) === '1') setDarkMode(true);
-        else setDarkMode(false);
-    } catch (e) {}
 })();
