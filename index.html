@@ -10,9 +10,12 @@
     <header class="top-nav">
             <nav class="nav">
             <a href="#about" class="nav-link active" data-section="about">about</a>
+            <!--
             <a href="#experience" class="nav-link" data-section="experience">experience</a>
             <a href="#research" class="nav-link" data-section="research">research</a>
             <a href="#projects" class="nav-link" data-section="projects">projects</a>
+            -->
+            <a href="#notebook" class="nav-link" data-section="notebook">notebook</a>
             <a href="#music" class="nav-link" data-section="music">music</a>
             <a href="#contact" class="nav-link" data-section="contact">contact</a>
         </nav>
@@ -35,10 +38,11 @@
         <main class="main">
             <div id="about-panel" class="panel active">
                 <div class="panel-content">
-                    <p>I am a graduate student in Electrical Engineering and Computer Sciences (EECS) at UC Berkeley, with a focus on reinforcement learning and robotics. I work in Berkeley Artificial Intelligence Research (BAIR) with my advisor <a href="https://www2.eecs.berkeley.edu/Faculty/Homepages/zakhor.html" target="_blank" rel="noopener">Avideh Zakhor</a> on robot learning for locomotion, manipulation, and real-world automation.</p>
+                    <p>I am a graduate student in Electrical Engineering and Computer Sciences (EECS) at UC Berkeley, with a focus on reinforcement learning and robotics. I work with my advisor <a href="https://www2.eecs.berkeley.edu/Faculty/Homepages/zakhor.html" target="_blank" rel="noopener">Avideh Zakhor</a> in the Berkeley Artificial Intelligence Research (BAIR) lab on loco-manipulation for humanoid robots.</p>
                     <p>I received my B.A. in Mathematics and Computer Science from Berkeley and am now pursuing an M.S. in EECS. My background is in computer vision, deep reinforcement learning, machine learning, robotics, and related areas. I am actively seeking research and industry opportunities in robotics, machine learning, and applied AI.</p>
                 </div>
             </div>
+            <!--
             <div id="experience-panel" class="panel">
                 <div class="panel-content">
                     <div class="experience-item">
@@ -58,8 +62,11 @@
                     </div>
                 </div>
             </div>
+            -->
+            <!--
             <div id="research-panel" class="panel">
                 <div class="panel-content">
+            -->
                     <!--
                     <div class="project-card">
                         <img class="project-card-img" src="assets/unitree-g1.png" alt="Unitree G1 Humanoid Robot">
@@ -78,6 +85,7 @@
                         </div>
                     </div>
                     -->
+                    <!--
                     <div class="project-card">
                         <img class="project-card-img" src="assets/icl-architecture.png" alt="ICL architecture">
                         <div class="project-card-body">
@@ -134,6 +142,7 @@
                             <p>Robotics project using a Sawyer collaborative arm for object manipulation, with computer vision for detecting colored blocks and ArUco markers. Team project at Berkeley.</p>
                         </div>
                     </div>
+                    -->
                     <!--
                     <div class="project-card">
                         <img class="project-card-img" src="assets/wheretoeat-chatbot.png" alt="WhereToEat Chatbot interface">
@@ -143,6 +152,7 @@
                         </div>
                     </div>
                     -->
+                    <!--
                     <div class="project-card">
                         <img class="project-card-img" src="assets/cot-sample-complexity.png" alt="Chain-of-Thought autoregressive process">
                         <div class="project-card-body">
@@ -157,6 +167,11 @@
                             <p>Literature review with <a href="https://www.cs.cmu.edu/~amarshah/" target="_blank" rel="noopener">Amar Shah</a> on complexities for Condorcet-consistent voting systems (Dodgson, Kemeny, Ranked Pairs) and applications to simple stable voting.</p>
                         </div>
                     </div>
+                </div>
+            </div>
+            -->
+            <div id="notebook-panel" class="panel">
+                <div class="panel-content">
                 </div>
             </div>
             <div id="music-panel" class="panel">
@@ -175,29 +190,6 @@
                 </div>
             </div>
         </main>
-    </div>
-    <div id="vim-status" class="vim-status hidden"></div>
-    <div id="vim-help" class="vim-help hidden">
-        <div class="vim-help-inner">
-            <h3>vim keys</h3>
-<pre>h  l  ← →         char left / right
-j  k  ↓ ↑         line down / up
-w  b  e           next word / prev word / word end
-0  $              line start / end
-gg  G             top / bottom of section
-Ctrl-d  Ctrl-u    half page down / up
-Ctrl-f  Ctrl-b    full page down / up
-f{c} F{c}         find char forward / back on line
-t{c} T{c}         till char forward / back on line
-;  ,              repeat last find / reverse
-/pattern          search within section
-n  N              next / prev match
-:about :experience :research :projects :music :contact
-:dark  :light     toggle theme
-:help  ?          this overlay
-Esc               cancel / back to nav</pre>
-            <p class="vim-help-close">click or press any key to close</p>
-        </div>
     </div>
     <script src="app.js" defer></script>
 </body>

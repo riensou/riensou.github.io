@@ -150,67 +150,6 @@ body {
     text-decoration: underline;
     text-underline-offset: 4px;
 }
-.ch.cursor-on {
-    background: var(--accent);
-    color: var(--bg);
-}
-.ch.search-match {
-    background: rgba(255, 200, 0, 0.35);
-}
-body.dark-mode .ch.search-match {
-    background: rgba(255, 200, 0, 0.25);
-}
-.vim-status {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 0.3rem 1rem;
-    background: var(--bg);
-    border-top: 1px solid var(--border);
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 0.85rem;
-    color: var(--text);
-    z-index: 20;
-    white-space: pre;
-}
-.vim-status.hidden { display: none; }
-.vim-status .vs-prefix { color: var(--accent); }
-.vim-status .vs-caret {
-    display: inline-block;
-    width: 0.5ch;
-    background: var(--text);
-    color: var(--bg);
-    animation: vimBlink 1s steps(2, start) infinite;
-}
-@keyframes vimBlink { to { visibility: hidden; } }
-.vim-help {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.45);
-    z-index: 30;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.vim-help.hidden { display: none; }
-.vim-help-inner {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    padding: 1.25rem 1.5rem;
-    max-width: 44rem;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 0.8rem;
-    color: var(--text);
-}
-.vim-help h3 {
-    margin: 0 0 0.8rem;
-    font-family: inherit;
-    font-size: 0.95rem;
-    color: var(--accent);
-}
-.vim-help pre { margin: 0 0 0.9rem; white-space: pre-wrap; }
-.vim-help-close { text-align: right; font-size: 0.72rem; color: var(--text-muted); margin: 0; }
 .main {
     margin-left: var(--sidebar-width);
     flex: 1;
