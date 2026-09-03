@@ -90,6 +90,18 @@ body {
 .sidebar-music-blurb {
     display: none;
 }
+.sidebar-photo-contact {
+    display: none;
+    width: 100%;
+    max-width: 180px;
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+    margin-bottom: 0.8rem;
+    border: none;
+}
+.sidebar.sidebar--contact .sidebar-photo { display: none; }
+.sidebar.sidebar--contact .sidebar-photo-contact { display: block; }
 .sidebar.sidebar--music .sidebar-photo,
 .sidebar.sidebar--music .sidebar-default-blurb {
     display: none;
@@ -156,6 +168,9 @@ body {
     padding: 1.5rem 1.75rem 3rem 1.5rem;
     min-height: calc(100vh - 2.5rem);
 }
+body.no-sidebar .sidebar { display: none; }
+body.no-sidebar .main { margin-left: 0; }
+body.no-sidebar .panel-content { margin: 0 auto; }
 .panel { display: none; }
 .panel.active { display: block; }
 .panel-content { max-width: 64rem; }
@@ -219,7 +234,7 @@ a:hover { color: var(--accent-hover); text-decoration: underline; }
 .contact-email {
     font-family: inherit;
     font-size: 0.875rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.3rem;
     color: var(--text);
 }
 .contact-row { margin-bottom: 0.3rem; font-size: 0.875rem; }
@@ -234,6 +249,55 @@ a:hover { color: var(--accent-hover); text-decoration: underline; }
     font-weight: 400;
 }
 .contact-links a:hover { background: transparent; color: var(--accent-hover); text-decoration: underline; }
+.note-row { margin-bottom: 0.3rem; }
+.note-date { color: var(--text-muted); white-space: pre; }
+.note-back { margin-bottom: 1.2rem; }
+.note-topic { margin: 0 0 0.3rem 0; }
+.note-topic-title { margin: 0 0 0.3rem 0; }
+.note-topic-title a { color: var(--text-muted); }
+.note-topic-title a:hover { color: var(--accent); text-decoration: none; }
+.note-topic-count { color: var(--text-muted); font-size: 0.8rem; }
+.note-topic.collapsed .note-row { display: none; }
+.note-topic .note-row { margin-left: 1.25rem; }
+.note-body h1,
+.note-body h2,
+.note-body h3 {
+    color: var(--text);
+    text-transform: none;
+    font-weight: 700;
+}
+.note-body h1 { font-size: 1rem; margin: 0 0 0.8rem 0; }
+.note-body h2 { font-size: 0.92rem; margin: 1.4rem 0 0.5rem 0; }
+.note-body h3 { font-size: 0.88rem; margin: 1.2rem 0 0.4rem 0; }
+.note-body code {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 0.05rem 0.3rem;
+}
+.note-body pre {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 0.75rem;
+    overflow-x: auto;
+    margin: 0 0 0.8rem 0;
+}
+.note-body pre code { background: transparent; border: none; padding: 0; }
+.note-body blockquote {
+    margin: 0 0 0.8rem 0;
+    padding-left: 0.75rem;
+    border-left: 2px solid var(--border-accent);
+    color: var(--text-muted);
+}
+.note-body img { max-width: 100%; height: auto; display: block; margin-left: auto; margin-right: auto; }
+.note-body table { border-collapse: collapse; margin: 0 auto 0.8rem auto; font-size: 0.82rem; }
+.note-body th, .note-body td { border: 1px solid var(--border); padding: 0.3rem 0.6rem; text-align: left; }
+.note-body th { color: var(--text-muted); font-weight: 700; }
+.smiles-fig { display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center; margin: 0 0 0.8rem 0; }
+.smiles-img { max-height: 200px; max-width: 100%; width: auto; }
+.note-body ul, .note-body ol { margin: 0 0 0.8rem 0; padding-left: 1.4rem; }
+.note-body hr { border: none; border-top: 1px solid var(--border); margin: 1.2rem 0; }
 @media (max-width: 768px) {
     .top-nav { height: auto; min-height: 2.5rem; padding: 0.5rem 1rem; }
     .nav { flex-wrap: wrap; }

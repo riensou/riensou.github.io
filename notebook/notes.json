@@ -1,0 +1,18 @@
+[
+    {   
+        "topic": "forecasting",
+        "title": "forecasting",
+        "notes": [
+            { "slug": "halley", "title": "Halley’s historical extrapolation", "date": "2026-08-31"},
+            { "slug": "minimizing_errors", "title": "Forecasting the future by minimizing errors in the past", "date": "2026-09-03"},
+            { "slug": "weather", "title": "Should I bring an umbrella?", "date": "2026-09-07"}
+        ]
+    },
+    {
+        "slug": "opsd", "title": "On-Policy Self-Distillation", "date": "2026-09-01"
+    },
+    {
+        "slug": "mjlab", "title": "mjlab", "date": "2026-09-02"
+    }
+
+]

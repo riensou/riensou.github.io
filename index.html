@@ -5,20 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ryan Campbell | EECS @ UC Berkeley</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.11/katex.min.css">
 </head>
 <body>
     <script>try { if (localStorage.getItem('riensou-theme') !== 'light') document.body.classList.add('dark-mode'); } catch (e) {}</script>
     <header class="top-nav">
-            <nav class="nav">
+        <nav class="nav">
             <a href="#about" class="nav-link active" data-section="about">about</a>
-            <!--
-            <a href="#experience" class="nav-link" data-section="experience">experience</a>
-            <a href="#research" class="nav-link" data-section="research">research</a>
-            <a href="#projects" class="nav-link" data-section="projects">projects</a>
-            -->
-            <a href="#notebook" class="nav-link" data-section="notebook">notebook</a>
-            <a href="#music" class="nav-link" data-section="music">music</a>
+            <!-- hidden sections live in sections/: experience, research, projects.
+                 To re-enable one, add its nav link here and a panel below. -->
             <a href="#contact" class="nav-link" data-section="contact">contact</a>
+            <a href="#music" class="nav-link" data-section="music">music</a>
+            <a href="#notebook" class="nav-link" data-section="notebook">notebook</a>
         </nav>
         <button type="button" class="dark-mode-btn" id="dark-mode-btn" aria-label="Toggle dark mode">Light</button>
     </header>
@@ -26,172 +24,37 @@
         <aside class="sidebar" id="sidebar">
             <img class="sidebar-photo" src="assets/ryan.jpg" alt="Ryan Campbell">
             <img class="sidebar-photo-music" src="assets/spotify-profile.png" alt="Ryan Campbell">
+            <img class="sidebar-photo-contact" src="assets/contact.jpg" alt="Ryan Campbell">
             <h1>Ryan Campbell</h1>
             <div class="sidebar-default-blurb">
-                <p class="sidebar-title">Graduate Student, EECS Department, UC Berkeley.</p>
-                <p class="sidebar-subtitle">San Francisco Bay Area · Robotics researcher; applied ML and deep RL.</p>
+                <p class="sidebar-title">UC Berkeley EECS MS</p>
+                <p class="sidebar-subtitle">Robotics, Applied ML, Deep RL.</p>
             </div>
             <div class="sidebar-music-blurb">
-                <p class="sidebar-title">Jazz Musician · Bass & Piano.</p>
-                <p class="sidebar-subtitle">San Francisco Bay Area · Composer, Performer, Instructor</p>
+                <p class="sidebar-title">Jazz Musician</p>
+                <p class="sidebar-subtitle">Composer, Performer, Instructor.</p>
             </div>
         </aside>
         <main class="main">
             <div id="about-panel" class="panel active">
-                <div class="panel-content">
-                    <p>I am a graduate student in Electrical Engineering and Computer Sciences (EECS) at UC Berkeley, with a focus on reinforcement learning and robotics. I work with my advisor <a href="https://www2.eecs.berkeley.edu/Faculty/Homepages/zakhor.html" target="_blank" rel="noopener">Avideh Zakhor</a> in the Berkeley Artificial Intelligence Research (BAIR) lab on loco-manipulation for humanoid robots.</p>
-                    <p>I received my B.A. in Mathematics and Computer Science from Berkeley and am now pursuing an M.S. in EECS. My background is in computer vision, deep reinforcement learning, machine learning, robotics, and related areas. I am actively seeking research and industry opportunities in robotics, machine learning, and applied AI.</p>
-                </div>
+                <div class="panel-content" data-src="sections/about.html"></div>
             </div>
-            <!--
-            <div id="experience-panel" class="panel">
-                <div class="panel-content">
-                    <div class="experience-item">
-                        <h3>Graduate Research Assistant</h3>
-                        <div class="meta">Berkeley Artificial Intelligence Research (BAIR) · June 2025 – Present</div>
-                        <p>Developing locomotion and manipulation policies for Unitree G1 humanoid robots with Professor Avideh Zakhor. Running experiments in Isaac Sim via Isaac Lab with PPO and imitation learning for whole-body control, with the goal of simulation-to-real deployment.</p>
-                    </div>
-                    <div class="experience-item">
-                        <h3>Undergraduate Research Assistant</h3>
-                        <div class="meta">Berkeley Artificial Intelligence Research (BAIR) · Jan 2024 – May 2025</div>
-                        <p>Applied deep reinforcement learning to a real-world tracked robot for vacuuming and sealing applications. Developed ROS2 and Gazebo simulation pipelines and trained CNN-LSTM policies with PPO for autonomous navigation.</p>
-                    </div>
-                    <div class="experience-item">
-                        <h3>Teaching Assistant & Course Staff</h3>
-                        <div class="meta">UC Berkeley EECS · 2022 – 2025</div>
-                        <p>Tutor for <a href="https://berkeley-cs182.github.io/" target="_blank" rel="noopener">CS 182</a> (Deep Learning), reader for <a href="https://eecs189.org/" target="_blank" rel="noopener">CS 189</a> (Machine Learning), and academic intern for <a href="https://cs61a.org/" target="_blank" rel="noopener">CS 61A</a> (Structure and Interpretation of Computer Programs). Led discussion sections, developed and graded assignments and exams, and supported hundreds of students across introductory programming, machine learning, and deep learning.</p>
-                    </div>
-                </div>
-            </div>
-            -->
-            <!--
-            <div id="research-panel" class="panel">
-                <div class="panel-content">
-            -->
-                    <!--
-                    <div class="project-card">
-                        <img class="project-card-img" src="assets/unitree-g1.png" alt="Unitree G1 Humanoid Robot">
-                        <div class="project-card-body">
-                            <h3>Humanoid Loco-Manipulation</h3>
-                            <div class="meta">Berkeley Artificial Intelligence Research (BAIR) · 2025 – Present</div>
-                            <p>Developing locomotion and manipulation policies for the Unitree G1 humanoid robot. Using Isaac Sim and Isaac Lab with PPO and imitation learning for whole-body control, with the goal of simulation-to-real deployment.</p>
-                        </div>
-                    </div>
-                    <div class="project-card">
-                        <img class="project-card-img" src="assets/tracked-robot.png" alt="Tracked robot">
-                        <div class="project-card-body">
-                            <h3>Tracked Robot Control</h3>
-                            <div class="meta">Berkeley Artificial Intelligence Research (BAIR) · Jan 2024 – May 2025</div>
-                            <p>Applied deep reinforcement learning to a real-world tracked robot to automate vacuuming and sealing American attics. ROS2, Gazebo, PPO, CNN-LSTM policy for autonomous navigation.</p>
-                        </div>
-                    </div>
-                    -->
-                    <!--
-                    <div class="project-card">
-                        <img class="project-card-img" src="assets/icl-architecture.png" alt="ICL architecture">
-                        <div class="project-card-body">
-                            <h3><a href="https://arxiv.org/abs/2411.03945" target="_blank" rel="noopener">Can Custom Models Learn In-Context? An Exploration of Hybrid Architecture Performance on In-Context Learning Tasks</a></h3>
-                            <div class="meta">R. Campbell, N. Lojo, K. Viswanadha, et al. · Nov 2024</div>
-                            <p>Explores how hybrid architectures (GPT-2/LLaMa, LLaMa/Mamba) perform on in-context learning tasks. Proposes the "ICL regression score" and releases a typed, modular Python package.</p>
-                        </div>
-                    </div>
-                    <div class="project-card">
-                        <img class="project-card-img" src="assets/acl-framework.png" alt="ACL framework">
-                        <div class="project-card-body">
-                            <h3><a href="https://arxiv.org/abs/2312.13565" target="_blank" rel="noopener">Automatic Curriculum Learning with Gradient Reward Signals</a></h3>
-                            <div class="meta">R. Campbell, J. Yoon · Dec 2023</div>
-                            <p>Uses gradient norm reward signals in automatic curriculum learning for DRL. Evaluated on PointMaze, AntMaze, and AdroitHandRelocate. Shows accelerated learning and improved generalization.</p>
-                        </div>
-                    </div>
-                    <div class="project-card">
-                        <img class="project-card-img" src="assets/sequential-icl.png" alt="In-context learning of function classes (Garg et al.)">
-                        <div class="project-card-body">
-                            <h3><a href="https://arxiv.org/abs/2312.12655" target="_blank" rel="noopener">Can Transformers Learn Sequential Function Classes In Context?</a></h3>
-                            <div class="meta">R. Campbell, E. Guo, E. Hu, R. Vir, E. Hsiao · Dec 2023</div>
-                            <p>Extends the in-context learning framework of <a href="https://arxiv.org/abs/2208.01066" target="_blank" rel="noopener">Garg et al.</a> to sequential function classes. We introduce a sliding-window sequential function class and show that transformers can in-context learn these tasks; we also study robustness under randomized labels. </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div id="projects-panel" class="panel">
-                <div class="panel-content">
-                    <div class="project-card">
-                        <img class="project-card-img" src="assets/muon-update-rules.png" alt="Update rules: SGD, Muon, and Schatten norm">
-                        <div class="project-card-body">
-                            <h3><a href="https://drive.google.com/file/d/1hrU64pTHsVOBDVmxOxD2xXqJVNyS0LwE/view?usp=sharing" target="_blank" rel="noopener">Interpolating Muon</a></h3>
-                            <p>Project on interpolating optimizers and the geometry of gradient updates. Analysis of matrix update rules and their associated norms: SGD (Euclidean), Muon (spectral norm), and a family of Schatten-(1+1/p) norms. Proposes a cheaper alternative to Muon that matches its empirical performance.</p>
-                        </div>
-                    </div>
-                    <div class="project-card">
-                        <img class="project-card-img" src="cs180/final/media/2900.gif" alt="NeRF lego">
-                        <div class="project-card-body">
-                            <h3><a href="cs180/index.html">CS 180: Computer Vision</a></h3>
-                            <p>Course project writeups: image processing, filters, face morphing, photo mosaics, diffusion models, neural radiance field.</p>
-                        </div>
-                    </div>
-                    <div class="project-card">
-                        <img class="project-card-img" src="assets/coup-agent.png" alt="Coup agent">
-                        <div class="project-card-body">
-                            <h3><a href="https://github.com/riensou/coup" target="_blank" rel="noopener">Coup: RL agent for the card game</a></h3>
-                            <p>Reinforcement learning agent for Coup. Agent network with game state and history, action heads with masking for legal moves.</p>
-                        </div>
-                    </div>
-                    <div class="project-card">
-                        <img class="project-card-img" src="assets/sawyrter.png" alt="Sawyrter: Sawyer robot with colored blocks">
-                        <div class="project-card-body">
-                            <h3><a href="https://sites.google.com/berkeley.edu/sawyrter/home" target="_blank" rel="noopener">Sawyrter</a></h3>
-                            <p>Robotics project using a Sawyer collaborative arm for object manipulation, with computer vision for detecting colored blocks and ArUco markers. Team project at Berkeley.</p>
-                        </div>
-                    </div>
-                    -->
-                    <!--
-                    <div class="project-card">
-                        <img class="project-card-img" src="assets/wheretoeat-chatbot.png" alt="WhereToEat Chatbot interface">
-                        <div class="project-card-body">
-                            <h3><a href="https://www.youtube.com/watch?v=Uac_E676KiQ" target="_blank" rel="noopener">WhereToEat Chatbot</a></h3>
-                            <p>AI chatbot built with a team of 4 at the Cal Hacks AI Hackathon to help with restaurant selection. Next.js frontend (deployed on Vercel), Python backend using OpenAI and Google Maps APIs.</p>
-                        </div>
-                    </div>
-                    -->
-                    <!--
-                    <div class="project-card">
-                        <img class="project-card-img" src="assets/cot-sample-complexity.png" alt="Chain-of-Thought autoregressive process">
-                        <div class="project-card-body">
-                            <h3><a href="https://drive.google.com/file/d/1tjjA5rN1jlTURNSawVzUdDbiHAVVvY6p/view?usp=sharing" target="_blank" rel="noopener">Sample Complexity for Agnostic Learning with Autoregressive Chain of Thought</a></h3>
-                            <p>Sample and computational complexity of learning prompt-to-answer mappings when the model generates a chain-of-thought and the final token is the answer. Inspired by <a href="https://arxiv.org/abs/2503.07932" target="_blank" rel="noopener">Joshi et al.</a> on learning with autoregressive chain-of-thought.</p>
-                        </div>
-                    </div>
-                    <div class="project-card">
-                        <img class="project-card-img" src="assets/condorcet-voting.png" alt="Condorcet consistent voting diagram">
-                        <div class="project-card-body">
-                            <h3><a href="https://drive.google.com/file/d/18i5euolrJAkeSWxi5vtbUtVfned-gl30/view?" target="_blank" rel="noopener">Algorithm(s) and Complexity for Condorcet Consistent Voting</a></h3>
-                            <p>Literature review with <a href="https://www.cs.cmu.edu/~amarshah/" target="_blank" rel="noopener">Amar Shah</a> on complexities for Condorcet-consistent voting systems (Dodgson, Kemeny, Ranked Pairs) and applications to simple stable voting.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            -->
+            <!-- notebook content is rendered by app.js from notebook/notes.json + notebook/*.md -->
             <div id="notebook-panel" class="panel">
-                <div class="panel-content">
-                </div>
+                <div class="panel-content"></div>
             </div>
             <div id="music-panel" class="panel">
-                <div class="panel-content">
-                    <p>I play jazz bass and piano, write and record my own music, and perform with a few groups in the Bay Area.</p>                        
-                    <p>Check out my personal artist <a href="https://open.spotify.com/artist/4scuHOBOXqB0H65a2JUhHU?si=zZ77l6MESqekNp6XnVcaoA" target="_blank" rel="noopener">Spotify</a>, <strong>Frankly Martini</strong> on <a href="https://open.spotify.com/artist/1klziV4NZrkfjzVvyCihuS?si=lS34GwKESPCq4j3ACaNfzg" target="_blank" rel="noopener">Spotify</a> and <a href="https://www.instagram.com/franklymartini/" target="_blank" rel="noopener">Instagram</a>, and <strong>The Fabric</strong> on <a href="https://www.instagram.com/thefabricofficial/" target="_blank" rel="noopener">Instagram</a>.</p>
-                    <p>During my time at UC Berkeley, I've studied in <a href="https://ucjazz.berkeley.edu/" target="_blank" rel="noopener">UC Jazz</a> with Frank Martin, Ted Moore, and Dan Zinn. I've also taken private lessons on bass with Daniel Lucca Parenti and on piano with Joan Cifarelli. I teach private lessons and lead my own ensemble in the UC Jazz program.</p>
-                </div>
+                <div class="panel-content" data-src="sections/music.html"></div>
             </div>
             <div id="contact-panel" class="panel">
-                <div class="panel-content">
-                    <p class="contact-email">ryancampbell [at] berkeley [dot] edu</p>
-                    <p class="contact-row"><span class="contact-key">scholar:</span>  <a href="https://scholar.google.com/citations?user=GxvmqCAAAAAJ&hl=en">scholar.google.com/citations?user=GxvmqCAAAAAJ</a></p>
-                    <p class="contact-row"><span class="contact-key">github:</span>   <a href="https://github.com/riensou">github.com/riensou</a></p>
-                    <p class="contact-row"><span class="contact-key">linkedin:</span> <a href="https://www.linkedin.com/in/ryancampbell24/">linkedin.com/in/ryancampbell24</a></p>
-                </div>
+                <div class="panel-content" data-src="sections/contact.html"></div>
             </div>
         </main>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.11/katex.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.11/contrib/mhchem.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/smiles-drawer@2.1.7/dist/smiles-drawer.min.js" defer></script>
     <script src="app.js" defer></script>
 </body>
 </html>
