@@ -3,12 +3,46 @@
         "topic": "forecasting",
         "title": "forecasting",
         "notes": [
-            { "slug": "halley", "title": "Halley’s historical extrapolation", "date": "2026-08-31"},
-            { "slug": "minimizing_errors", "title": "Forecasting the future by minimizing errors in the past", "date": "2026-09-03"},
-            { "slug": "weather", "title": "Should I bring an umbrella?", "date": "2026-09-07"}
+            { "slug": "halley", "title": "Halley’s historical extrapolation", "date": "2026-08-31" },
+            { "slug": "minimizing_errors", "title": "Forecasting the future by minimizing errors in the past", "date": "2026-09-03" },
+            { "slug": "weather", "title": "Should I bring an umbrella?", "date": "2026-09-07" },
+            { "slug": "probability", "title": "Probability, proper scoring rules, and calibration", "date": "2026-09-10" },
+            { "slug": "earthquake", "title": "What is the chance of an earthquake?", "date": "2026-09-14" },
+            { "slug": "stochastic", "title": "Stochastic methods for time series prediction", "date": "2026-09-16"}
         ]
     },
     {
-        "slug": "opsd", "title": "On-Policy Self-Distillation", "date": "2026-09-01"
+        "topic": "chemistry",
+        "title": "chemistry",
+        "notes": [
+            { "slug": "essential", "title": "Essential Ideas", "date": "2026-09-15" }, 
+            { "slug": "atoms", "title": "Atoms, Molecules, and Ions", "date": "2026-09-16"}
+        ]
+    },
+    {
+        "topic": "biology",
+        "title": "biology",
+        "notes": [
+            { "slug": "chemical_life", "title": "The Chemical Foundation of Life", "date": "2026-09-23" }
+        ]
+    },
+    {
+        "topic": "history",
+        "title": "history",
+        "notes": [
+            { "slug": "lvh1", "title": "LVH I: Definitions & Preface", "date": "2026-09-15"},
+            { "slug": "lvh2", "title": "LVH II: The Great Drought, 1876-1878", "date": "2026-10-06"},
+            { "slug": "lvh3", "title": "LVH III: El Niño and the New Imperialism, 1888-1902", "date": "2026-10-27"},
+            { "slug": "lvh4", "title": "LVH IV: Deciphering ENSO", "date": "2026-11-10"},
+            { "slug": "lvh5", "title": "LVH V: The Political Ecology of Famine", "date": "2026-12-08"}
+        ]
+    },
+    {
+        "topic": "rl",
+        "title": "reinforcement learning",
+        "notes": [
+            { "slug": "opsd", "title": "On-Policy Self-Distillation", "date": "2026-09-01" },
+            { "slug": "gae", "title": "Generalized Advantage Estimation", "date": "2026-09-14" }
+        ]
     }
 ]

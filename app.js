@@ -72,20 +72,23 @@
         return html.replace(/@@MATH(\d+)@@/g, function(_, i) { return stash[+i]; });
     }
 
-    // notes.json entries are either a one-off note { slug, title, date } with its
-    // file at notebook/<slug>.md, or a topic { topic, title, notes: [...] } whose
-    // notes live at notebook/<topic>/<slug>.md and route as #notebook/<topic>/<slug>.
-    function noteRow(path, title, date) {
-        return '<p class="note-row"><span class="note-date">' + (date || '') +
-            '</span> <a href="#notebook/' + path + '">' + title + '</a></p>';
+    // notes.json entries are either a note { slug, title, date } or a topic
+    // { topic, title, notes: [...] } whose notes array may itself contain both
+    // notes and nested topics, to any depth. Files mirror the nesting: a note's
+    // .md lives at notebook/<topic path>/<slug>.md and routes as
+    // #notebook/<topic path>/<slug>, e.g. notebook/chemistry/organic/alkenes.md.
+    function noteRow(path, title, date, treePrefix) {
+        return '<p class="note-row"><span class="note-tree">' + treePrefix + '</span>' +
+            '<a href="#notebook/' + path + '">' + title + '</a>' +
+            (date ? '<span class="note-date">  ' + date + '</span>' : '') + '</p>';
     }
     function findNote(entries, path) {
         var found = null;
         entries.forEach(function(e) {
+            if (found) return;
             if (e.notes) {
-                e.notes.forEach(function(n) {
-                    if (e.topic + '/' + n.slug === path) found = n;
-                });
+                var prefix = e.topic + '/';
+                if (path.indexOf(prefix) === 0) found = findNote(e.notes, path.slice(prefix.length));
             } else if (e.slug === path) {
                 found = e;
             }
@@ -121,45 +124,53 @@
                     container.innerHTML = '<p>No notes yet.</p>';
                     return;
                 }
-                // Newest first everywhere: notes within a topic sort by date, and a
-                // topic sorts against one-off notes by its most recent note's date.
+                // Newest first everywhere: a topic sorts against its siblings by
+                // the most recent note anywhere in its subtree.
                 function entryDate(e) {
                     if (!e.notes) return e.date || '';
                     return e.notes.reduce(function(max, n) {
-                        return (n.date || '') > max ? n.date : max;
+                        var d = entryDate(n);
+                        return d > max ? d : max;
                     }, '');
                 }
                 function byDateDesc(a, b) {
                     var da = entryDate(a), db = entryDate(b);
                     return da === db ? 0 : (da < db ? 1 : -1);
                 }
-                container.innerHTML = entries.slice().sort(byDateDesc).map(function(e) {
-                    if (e.notes) {
-                        var open = !!expandedTopics[e.topic];
-                        return '<div class="note-topic' + (open ? '' : ' collapsed') + '" data-topic="' + e.topic + '">' +
-                            '<p class="note-topic-title"><a href="#" class="note-topic-toggle">' +
-                            '<span class="note-topic-caret">' + (open ? '&#9662;' : '&#9656;') + '</span> ' +
-                            e.title + '/</a></p>' +
-                            e.notes.slice().sort(byDateDesc).map(function(n) {
-                                return noteRow(e.topic + '/' + n.slug, n.title, n.date);
-                            }).join('') + '</div>';
-                    }
-                    return noteRow(e.slug, e.title, e.date);
-                }).join('');
+                // Rendered as a file tree: box-drawing connectors, folders named
+                // with a trailing slash. Clicking a folder still toggles it.
+                function renderEntries(list, pathPrefix, treePrefix, top) {
+                    var sorted = list.slice().sort(byDateDesc);
+                    return sorted.map(function(e, i) {
+                        var last = i === sorted.length - 1;
+                        var connector = top ? '' : treePrefix + (last ? '└── ' : '├── ');
+                        var childPrefix = top ? '' : treePrefix + (last ? '    ' : '│   ');
+                        if (e.notes) {
+                            var path = pathPrefix + e.topic;
+                            var open = !!expandedTopics[path];
+                            return '<div class="note-topic' + (open ? '' : ' collapsed') + '" data-topic="' + path + '">' +
+                                '<p class="note-row"><span class="note-tree">' + connector + '</span>' +
+                                '<a href="#" class="note-topic-toggle">' + e.title + '/</a></p>' +
+                                '<div class="note-topic-children">' +
+                                renderEntries(e.notes, path + '/', childPrefix) + '</div></div>';
+                        }
+                        return noteRow(pathPrefix + e.slug, e.title, e.date, connector);
+                    }).join('');
+                }
+                container.innerHTML = renderEntries(entries, '', '', true);
                 container.querySelectorAll('.note-topic-toggle').forEach(function(t) {
                     t.addEventListener('click', function(ev) {
                         ev.preventDefault();
                         var topicEl = t.closest('.note-topic');
                         var open = !topicEl.classList.toggle('collapsed');
                         expandedTopics[topicEl.getAttribute('data-topic')] = open;
-                        topicEl.querySelector('.note-topic-caret').innerHTML = open ? '&#9662;' : '&#9656;';
                     });
                 });
                 return;
             }
             var note = findNote(entries, slug);
             if (!note) {
-                container.innerHTML = '<p>Note not found. <a href="#notebook">&larr; back to notebook</a></p>';
+                container.innerHTML = '<p>Note not found. <a href="#notebook">../</a></p>';
                 return;
             }
             fetch('notebook/' + slug + '.md')
@@ -169,12 +180,12 @@
                 })
                 .then(function(md) {
                     container.innerHTML =
-                        '<p class="note-back"><a href="#notebook">&larr; notebook</a></p>' +
+                        '<p class="note-back"><a href="#notebook">../</a></p>' +
                         '<div class="note-body">' + renderMarkdown(md) + '</div>';
                     drawSmiles(container);
                 })
                 .catch(function(err) {
-                    container.innerHTML = '<p>Failed to load note (' + err.message + '). <a href="#notebook">&larr; back to notebook</a></p>';
+                    container.innerHTML = '<p>Failed to load note (' + err.message + '). <a href="#notebook">../</a></p>';
                 });
         });
     }
@@ -196,6 +207,7 @@
                 sidebar.classList.toggle('sidebar--contact', sectionId === 'contact');
             }
             document.body.classList.toggle('no-sidebar', sectionId === 'notebook');
+            document.body.classList.toggle('note-open', sectionId === 'notebook' && !!sub);
             if (sectionId === 'notebook') renderNotebook(sub);
             if (history.replaceState) history.replaceState(null, '', '#' + sectionId + (sub ? '/' + sub : ''));
         }
