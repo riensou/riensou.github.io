@@ -172,6 +172,8 @@ body.no-sidebar .sidebar { display: none; }
 body.no-sidebar .main { margin-left: 0; }
 body.note-open .top-nav { display: none; }
 body.note-open .layout { padding-top: 0; }
+body.note-open .panel { display: none; }
+body.note-open #notebook-panel { display: block; }
 body.no-sidebar .panel-content { margin: 0 auto; }
 .panel { display: none; }
 .panel.active { display: block; }
@@ -267,8 +269,9 @@ a:hover { color: var(--accent-hover); text-decoration: underline; }
     margin: 0 0 0.65rem 0;
 }
 .about-authors strong { color: var(--text); font-weight: 400; }
-.note-row { margin-bottom: 0.25rem; }
-.note-tree { color: var(--text-muted); white-space: pre; }
+.note-row { margin-bottom: 0.25rem; display: flex; align-items: baseline; }
+.note-tree { color: var(--text-muted); white-space: pre; flex: none; }
+.note-label { flex: 1 1 auto; min-width: 0; }
 .note-date { color: var(--text-muted); white-space: pre; font-size: 0.8rem; }
 .note-back { margin-bottom: 1.2rem; }
 .note-back a:hover { color: var(--accent-hover); text-decoration: underline; text-underline-offset: 4px; }
@@ -333,6 +336,7 @@ a:hover { color: var(--accent-hover); text-decoration: underline; }
     }
     .sidebar-photo { margin-bottom: 0; max-width: 64px; }
     .sidebar-photo-music { margin-bottom: 0; max-width: 64px; }
+    .sidebar-photo-contact { margin-bottom: 0; max-width: 64px; }
     .main { margin-left: 0; margin-top: 0; padding: 1rem; min-height: 100vh; }
     .project-card-img { width: 80px; min-width: 80px; height: 60px; }
 }

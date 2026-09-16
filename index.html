@@ -8,7 +8,18 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.11/katex.min.css">
 </head>
 <body>
-    <script>try { if (localStorage.getItem('riensou-theme') !== 'light') document.body.classList.add('dark-mode'); } catch (e) {}</script>
+    <script>
+    try { if (localStorage.getItem('riensou-theme') !== 'light') document.body.classList.add('dark-mode'); } catch (e) {}
+    // Apply routing classes before first paint so a note URL never flashes
+    // the nav/sidebar/about panel while scripts and sections load.
+    try {
+        var h0 = window.location.hash.slice(1);
+        if (h0.indexOf('notebook') === 0) {
+            document.body.classList.add('no-sidebar');
+            if (h0.indexOf('notebook/') === 0) document.body.classList.add('note-open');
+        }
+    } catch (e) {}
+    </script>
     <header class="top-nav">
         <nav class="nav">
             <a href="#about" class="nav-link active" data-section="about">about</a>

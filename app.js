@@ -79,8 +79,8 @@
     // #notebook/<topic path>/<slug>, e.g. notebook/chemistry/organic/alkenes.md.
     function noteRow(path, title, date, treePrefix) {
         return '<p class="note-row"><span class="note-tree">' + treePrefix + '</span>' +
-            '<a href="#notebook/' + path + '">' + title + '</a>' +
-            (date ? '<span class="note-date">  ' + date + '</span>' : '') + '</p>';
+            '<span class="note-label"><a href="#notebook/' + path + '">' + title + '</a>' +
+            (date ? '<span class="note-date">  ' + date + '</span>' : '') + '</span></p>';
     }
     function findNote(entries, path) {
         var found = null;
@@ -118,6 +118,9 @@
     function renderNotebook(slug) {
         var container = document.querySelector('#notebook-panel .panel-content');
         if (!container) return;
+        // Clear immediately when opening a note so the list (or a previous
+        // note) doesn't linger while the markdown fetches.
+        if (slug) container.innerHTML = '';
         getNotes().then(function(entries) {
             if (!slug) {
                 if (!entries.length) {
@@ -150,7 +153,7 @@
                             var open = !!expandedTopics[path];
                             return '<div class="note-topic' + (open ? '' : ' collapsed') + '" data-topic="' + path + '">' +
                                 '<p class="note-row"><span class="note-tree">' + connector + '</span>' +
-                                '<a href="#" class="note-topic-toggle">' + e.title + '/</a></p>' +
+                                '<span class="note-label"><a href="#" class="note-topic-toggle">' + e.title + '/</a></span></p>' +
                                 '<div class="note-topic-children">' +
                                 renderEntries(e.notes, path + '/', childPrefix) + '</div></div>';
                         }

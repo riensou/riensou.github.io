@@ -11,3 +11,11 @@ A list of new words discovered during reading
 - <u>Paradigmatic</u> means serving as a typical example, model, or standard of something
 - <u>Privation</u> is a formal noun that means the lack or loss of the basic necessities and comforts of life, such as food, shelter, or freedom.
 - <u>Incisively</u> is an adverb that means acting or speaking in a clear, sharp, and direct way that cuts through confusion to get straight to the core of an issue
+- A <u>sojourn</u> is a temporary stay or visit in a place where you are not a permanent resident.
+- <u>Penurious</u> means extremely stingy or lacking enough money to pay for basic needs.
+- An <u>almshouse</u> is a charitable housing unit provided for people in need, especially the elderly, disabled, or poor, often free of rent
+- A <u>plenipotentiary</u> is a diplomat or person invested with full power and authority to act, negotiate, and sign agreements on behalf of a government or sovereign without needing further approval
+- <u>Facile</u> is an adjective that means achieved with little effort or too simple, often lacking the depth or care needed for a complex situation
+- <u>Basal</u> is an adjective that means relating to, situated at, or forming the base or lowest layer of an object, structure, or biological process
+- <u>Churlish</u> is an adjective that means rude, surly, and ungracious
+- <u>Obstinacy</u> is the quality of being unreasonably stubborn, unyielding, or fixed in one's opinions and actions despite persuasion or reason
