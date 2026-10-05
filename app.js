@@ -129,8 +129,14 @@
                 }
                 // Newest first everywhere: a topic sorts against its siblings by
                 // the most recent note anywhere in its subtree.
+                // "tbd" (any case) is a valid date value: displayed as-is, but
+                // sorted as if undated (oldest), so planned notes sink to the
+                // bottom of their folder instead of floating to the top.
                 function entryDate(e) {
-                    if (!e.notes) return e.date || '';
+                    if (!e.notes) {
+                        var d = e.date || '';
+                        return d.toLowerCase() === 'tbd' ? '' : d;
+                    }
                     return e.notes.reduce(function(max, n) {
                         var d = entryDate(n);
                         return d > max ? d : max;
@@ -249,6 +255,55 @@
 
     var darkBtn = document.getElementById('dark-mode-btn');
     var THEME_KEY = 'riensou-theme';
+
+    // right-click the Light/Dark button to pick the accent color
+    var ACCENTS = [
+        ['red', '#c04848'], ['orange', '#c7822e'], ['yellow', '#c4b43c'],
+        ['green', '#4ca64c'], ['blue', '#4a8ac4'], ['purple', '#9c6ac4']
+    ];
+    var accentMenu = null;
+    function closeAccentMenu() {
+        if (accentMenu) { accentMenu.remove(); accentMenu = null; }
+    }
+    function openAccentMenu() {
+        closeAccentMenu();
+        accentMenu = document.createElement('div');
+        accentMenu.className = 'accent-menu';
+        var current = document.body.getAttribute('data-accent') || 'green';
+        ACCENTS.forEach(function(a) {
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.title = a[0];
+            if (a[0] === current) b.className = 'current';
+            b.innerHTML = '<span class="swatch" style="background:' + a[1] + '"></span>';
+            b.addEventListener('click', function() {
+                if (a[0] === 'green') {
+                    document.body.removeAttribute('data-accent');
+                    try { localStorage.removeItem('riensou-accent'); } catch (e) {}
+                } else {
+                    document.body.setAttribute('data-accent', a[0]);
+                    try { localStorage.setItem('riensou-accent', a[0]); } catch (e) {}
+                }
+                closeAccentMenu();
+            });
+            accentMenu.appendChild(b);
+        });
+        document.body.appendChild(accentMenu);
+    }
+    if (darkBtn) {
+        darkBtn.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            if (accentMenu) closeAccentMenu();
+            else openAccentMenu();
+        });
+        darkBtn.title = 'click: light/dark \u00b7 right-click: accent color';
+    }
+    document.addEventListener('mousedown', function(e) {
+        if (accentMenu && !accentMenu.contains(e.target) && e.target !== darkBtn) closeAccentMenu();
+    });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeAccentMenu();
+    });
     function applyTheme(dark) {
         document.body.classList.toggle('dark-mode', dark);
         if (darkBtn) darkBtn.textContent = dark ? 'Light' : 'Dark';
