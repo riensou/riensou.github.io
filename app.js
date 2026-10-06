@@ -42,7 +42,7 @@
     function loadSections() {
         var slots = Array.prototype.slice.call(document.querySelectorAll('.panel-content[data-src]'));
         return Promise.all(slots.map(function(el) {
-            return fetch(el.getAttribute('data-src'))
+            return fetch(el.getAttribute('data-src'), { cache: 'no-cache' })
                 .then(function(res) {
                     if (!res.ok) throw new Error(res.status + ' ' + res.statusText);
                     return res.text();
@@ -59,7 +59,7 @@
     var notesPromise = null;
     function getNotes() {
         if (!notesPromise) {
-            notesPromise = fetch('notebook/notes.json')
+            notesPromise = fetch('notebook/notes.json', { cache: 'no-cache' })
                 .then(function(res) {
                     if (!res.ok) throw new Error(res.status + ' ' + res.statusText);
                     return res.json();
@@ -147,7 +147,7 @@
     function loadFigures(root) {
         root.querySelectorAll('.note-figure[data-fig]').forEach(function(el) {
             var path = el.getAttribute('data-fig');
-            fetch(path + '/fig.html')
+            fetch(path + '/fig.html', { cache: 'no-cache' })
                 .then(function(res) {
                     if (!res.ok) throw new Error(res.status + ' ' + res.statusText);
                     return res.text();
@@ -253,7 +253,7 @@
                 return;
             }
             Promise.all([
-                fetch('notebook/' + slug + '.md').then(function(res) {
+                fetch('notebook/' + slug + '.md', { cache: 'no-cache' }).then(function(res) {
                     if (!res.ok) throw new Error(res.status + ' ' + res.statusText);
                     return res.text();
                 }),
