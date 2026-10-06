@@ -88,6 +88,15 @@
         // A fence tagged `smiles` becomes molecule drawings (one per line),
         // rendered onto canvases by drawSmiles() after the HTML is inserted.
         for (var i = 1; i < parts.length; i += 2) {
+            // A fence tagged `figure` names a folder under assets/figures/;
+            // its fig.html fragment is fetched and spliced in by loadFigures()
+            var fg = parts[i].match(/^```figure[ \t]*\n([\s\S]*?)```$/);
+            if (fg) {
+                var figPath = fg[1].trim().replace(/\/+$/, '');
+                stash.push('<div class="note-figure" data-fig="' + figPath + '"></div>');
+                parts[i] = '@@MATH' + (stash.length - 1) + '@@';
+                continue;
+            }
             var sm = parts[i].match(/^```smiles[ \t]*\n([\s\S]*?)```$/);
             if (sm) {
                 var fig = '<div class="smiles-fig">' + sm[1].split('\n').filter(function(l) {
@@ -133,6 +142,29 @@
         });
         return found;
     }
+    // Fetch each figure fragment and splice it in, rendering any $...$
+    // labels with KaTeX directly (no markdown pass needed inside figures).
+    function loadFigures(root) {
+        root.querySelectorAll('.note-figure[data-fig]').forEach(function(el) {
+            var path = el.getAttribute('data-fig');
+            fetch(path + '/fig.html')
+                .then(function(res) {
+                    if (!res.ok) throw new Error(res.status + ' ' + res.statusText);
+                    return res.text();
+                })
+                .then(function(html) {
+                    el.innerHTML = html.replace(/\$([^$\n]+?)\$/g, function(_, tex) {
+                        try {
+                            return katex.renderToString(tex, { throwOnError: false });
+                        } catch (e) { return tex; }
+                    });
+                })
+                .catch(function(err) {
+                    el.innerHTML = '<p class="note-date">figure failed to load: ' + path + ' (' + err.message + ')</p>';
+                });
+        });
+    }
+
     // Render every img[data-smiles] under root with smiles-drawer (its draw()
     // fills an img element with the structure), matching the current theme.
     // Falls back to showing the SMILES text if the lib is missing or parsing fails.
@@ -233,6 +265,7 @@
                         '<p class="note-back"><a href="#notebook">../</a></p>' +
                         '<div class="note-body">' + renderMarkdown(md) + '</div>';
                     drawSmiles(container);
+                    loadFigures(container);
                 })
                 .catch(function(err) {
                     container.innerHTML = '<p>Failed to load note (' + err.message + '). <a href="#notebook">../</a></p>';
@@ -325,8 +358,8 @@
             var off = document.body.toggleAttribute('data-field-off');
             ft.classList.toggle('off', off);
             try {
-                if (off) localStorage.setItem('riensou-field', 'off');
-                else localStorage.removeItem('riensou-field');
+                if (off) localStorage.removeItem('riensou-field');
+                else localStorage.setItem('riensou-field', 'on');
             } catch (e) {}
         });
         accentMenu.appendChild(ft);

@@ -10,7 +10,7 @@
     <script>
     try { if (localStorage.getItem('riensou-theme') !== 'light') document.body.classList.add('dark-mode'); } catch (e) {}
     try { var acc = localStorage.getItem('riensou-accent'); if (acc) document.body.setAttribute('data-accent', acc); } catch (e) {}
-    try { if (localStorage.getItem('riensou-field') === 'off') document.body.setAttribute('data-field-off', ''); } catch (e) {}
+    try { if (localStorage.getItem('riensou-field') !== 'on') document.body.setAttribute('data-field-off', ''); } catch (e) { document.body.setAttribute('data-field-off', ''); }
     // Apply routing classes before first paint so a note URL never flashes
     // the nav/sidebar/about panel while scripts and sections load.
     try {
