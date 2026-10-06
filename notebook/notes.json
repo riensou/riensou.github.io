@@ -51,7 +51,8 @@
         "topic": "projection_theory",
         "title": "projection theory",
         "notes": [
-            { "slug": "introduction", "title": "Introduction to Projection Theory", "date": "2026-10-5"}
+            { "slug": "introduction", "title": "Introduction to Projection Theory", "date": "2026-10-5" },
+            { "slug": "methods", "title": "Fundamental Methods of Projection Theory", "date": "tbd" }
         ]
     }
 ]

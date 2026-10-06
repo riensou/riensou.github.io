@@ -111,6 +111,6 @@ Conjecture: if $A\subset\mathbb{R}$ is finite, then for every $\varepsilon>0$, $
 
 This type of problem is connected to projection theory.
 
-Theorem (Elekes): if $A\subseteq\mathbb{R}$ is finite, then $\max(|A+A|,|A\cdot A|)\gtrsim|A|^{5/4}$. The proof uses Szemerédi–Trotter.
+Theorem (Elekes): if $A\subset\mathbb{R}$ is finite, then $\max(|A+A|,|A\cdot A|)\gtrsim|A|^{5/4}$. The proof uses Szemerédi–Trotter.
 
 Theorem (Bourgain–Katz–Tao): if $p$ is prime, $A\subset\mathbb{F}_p$, and $|A|\leq p^{0.9}$, then $\max(|A+A|,|A\cdot A|)\gtrsim|A|^{1+\varepsilon}$ for some $\varepsilon>0$.
