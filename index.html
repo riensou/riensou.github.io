@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ryan Campbell</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.11/katex.min.css">
 </head>
 <body>
     <script>
     try { if (localStorage.getItem('riensou-theme') !== 'light') document.body.classList.add('dark-mode'); } catch (e) {}
     try { var acc = localStorage.getItem('riensou-accent'); if (acc) document.body.setAttribute('data-accent', acc); } catch (e) {}
+    try { if (localStorage.getItem('riensou-field') === 'off') document.body.setAttribute('data-field-off', ''); } catch (e) {}
     // Apply routing classes before first paint so a note URL never flashes
     // the nav/sidebar/about panel while scripts and sections load.
     try {
@@ -30,7 +30,10 @@
             <a href="#music" class="nav-link" data-section="music">music</a>
             <a href="#notebook" class="nav-link" data-section="notebook">notebook</a>
         </nav>
-        <button type="button" class="dark-mode-btn" id="dark-mode-btn" aria-label="Toggle dark mode">Light</button>
+        <div class="top-controls">
+            <button type="button" class="dark-mode-btn" id="dark-mode-btn" aria-label="Toggle dark mode">Light</button>
+            <button type="button" class="settings-btn" id="settings-btn" aria-label="Site settings">&#9881;&#xFE0E;</button>
+        </div>
     </header>
     <canvas id="sidebar-field" aria-hidden="true"></canvas>
     <div class="layout">
@@ -64,10 +67,6 @@
             </div>
         </main>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.11/katex.min.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.11/contrib/mhchem.min.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/smiles-drawer@2.1.7/dist/smiles-drawer.min.js" defer></script>
     <script src="app.js" defer></script>
     <script src="field.js" defer></script>
 </body>

@@ -14,4 +14,4 @@ Temple sent people to work camps for working on colonial railways, digging canal
 
 In jails, prisoners were fed better than temple wages, and it was not uncommon for people to try to end up in jail because of this.
 
-The [Poona Sarvajanik Sabha](https://en.wikipedia.org/wiki/Poona_Sarvajanik_Sabha) estimated that as much as 36-48% of the population had decilined in Madhee, Mohol, and Indi. Buckingham after ordering a rough census to comply with public opinion noted that in the Madras districts at least 1.5 million had died by 1877. 
+The [Poona Sarvajanik Sabha](https://en.wikipedia.org/wiki/Poona_Sarvajanik_Sabha) estimated that as much as 36-48% of the population had declined in Madhee, Mohol, and Indi. Buckingham after ordering a rough census to comply with public opinion noted that in the Madras districts at least 1.5 million had died by 1877. 

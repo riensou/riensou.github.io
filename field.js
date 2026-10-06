@@ -100,30 +100,31 @@
 
     // --- every cluster is rolled fresh: node count, spread, elongation, and
     // wiring density all random, so no two are alike ---
+    // Random organic networks: scattered nodes, each wired to its nearest
+    // neighbor plus chance links. The physics (node and edge repulsion below)
+    // relaxes each one into an open, untangled shape.
     function generate() {
-        if (Math.random() < 0.12) {
+        if (Math.random() < 0.12) { // lone traveler, sometimes a bonded pair
             var pair = Math.random() < 0.4;
             return {
-                pos: pair ? [[0, 0], [10 + Math.random() * 8, 0]] : [[0, 0]],
+                pos: pair ? [[0, 0], [16, 0]] : [[0, 0]],
                 edges: pair ? [[0, 1]] : [],
-                speedMult: 2.0 + Math.random() * 1.4
+                speedMult: 1.8 + Math.random() * 0.8
             };
         }
-        var k = 4 + Math.floor(Math.random() * 12);
-        var R = 26 + Math.random() * 44;
-        var squash = 0.25 + Math.random() * 0.75;
-        var rot = Math.random() * Math.PI;
-        var pos = [], i, j;
+        var grand = Math.random() < 0.15; // occasional big sprawling network
+        var k = grand ? 15 + Math.floor(Math.random() * 10) : 5 + Math.floor(Math.random() * 8);
+        var R = grand ? 75 + Math.random() * 50 : 30 + Math.random() * 30;
+        var pos = [], edges = [], i, j;
         for (i = 0; i < k; i++) {
             var a = Math.random() * Math.PI * 2, rr = Math.sqrt(Math.random()) * R;
-            var x = Math.cos(a) * rr, y = Math.sin(a) * rr * squash;
-            pos.push([x * Math.cos(rot) - y * Math.sin(rot), x * Math.sin(rot) + y * Math.cos(rot)]);
+            pos.push([Math.cos(a) * rr, Math.sin(a) * rr]);
         }
         function d2(i, j) {
             var dx = pos[i][0] - pos[j][0], dy = pos[i][1] - pos[j][1];
             return dx * dx + dy * dy;
         }
-        var edges = [], seen = {};
+        var seen = {};
         function addEdge(i, j) {
             var key = i < j ? i + '-' + j : j + '-' + i;
             if (!seen[key]) { seen[key] = 1; edges.push(i < j ? [i, j] : [j, i]); }
@@ -133,8 +134,7 @@
             for (j = 0; j < k; j++) if (j !== i && d2(i, j) < bd) { bd = d2(i, j); best = j; }
             if (best >= 0) addEdge(i, best);
         }
-        var t2 = Math.pow(R * (0.35 + Math.random() * 0.55), 2);
-        var p = 0.25 + Math.random() * 0.6;
+        var t2 = Math.pow(R * 0.75, 2), p = 0.3 + Math.random() * 0.4;
         for (i = 0; i < k; i++)
             for (j = i + 1; j < k; j++)
                 if (d2(i, j) < t2 && Math.random() < p) addEdge(i, j);
@@ -142,18 +142,37 @@
     }
 
     var clusters = [];
-    function targetCount() { return Math.max(12, Math.min(44, Math.round((W * H) / 45000))); }
+    function targetCount() { return Math.max(12, Math.min(36, Math.round((W * H) / 55000))); }
 
+    function nearestClusterDist(x, y) {
+        var best = 1e18;
+        for (var c = 0; c < clusters.length; c++) {
+            var cl = clusters[c];
+            if (cl._minX === undefined) continue;
+            var dx = (cl._minX + cl._maxX) / 2 - x, dy = (cl._minY + cl._maxY) / 2 - y;
+            var d = dx * dx + dy * dy;
+            if (d < best) best = d;
+        }
+        return Math.sqrt(best);
+    }
     function spawnCluster() {
         var shape = generate();
         var cx, cy, tx, ty;
         var SW = 260; // the sidebar corridor gets a dedicated share of traffic
-        if (Math.random() < 0.45) {
-            cx = Math.random() * SW; cy = Math.random() * H;
+        var corridor = Math.random() < 0.32;
+        // place where there's room: of a few candidates, take the loneliest
+        var bx = 0, by = 0, bd = -1;
+        for (var att = 0; att < 6; att++) {
+            var px = corridor ? Math.random() * SW : Math.random() * W;
+            var py = Math.random() * H;
+            var dd = nearestClusterDist(px, py);
+            if (dd > bd) { bd = dd; bx = px; by = py; }
+        }
+        cx = bx; cy = by;
+        if (corridor) {
             tx = Math.max(0, Math.min(SW, cx + (Math.random() - 0.5) * 160));
             ty = cy + (Math.random() < 0.5 ? H : -H);
         } else {
-            cx = Math.random() * W; cy = Math.random() * H;
             var ang = Math.random() * Math.PI * 2;
             tx = cx + Math.cos(ang) * 1000; ty = cy + Math.sin(ang) * 1000;
         }
@@ -171,7 +190,22 @@
             var a = shape.pos[e[0]], b = shape.pos[e[1]];
             return { i: e[0], j: e[1], rest: Math.hypot(a[0] - b[0], a[1] - b[1]) };
         });
-        return { nodes: nodes, springs: springs, bvx: bvx, bvy: bvy, scale: 1 };
+        var cl = { nodes: nodes, springs: springs, bvx: bvx, bvy: bvy, scale: 1,
+            kMul: 0.75 + Math.random() * 0.6,     // spring stiffness character
+            repMul: 0.7 + Math.random() * 0.7,    // how strongly it disperses
+            relax: 0.94 + Math.random() * 0.025   // how quickly it settles
+        };
+        for (var pi = 0; pi < nodes.length; pi++) nodes[pi]._rep = cl.repMul;
+        // record the bbox immediately so spawn spacing can see this cluster
+        var mnx = 1e18, mxx = -1e18, mny = 1e18, mxy = -1e18;
+        for (var ni = 0; ni < nodes.length; ni++) {
+            if (nodes[ni].x < mnx) mnx = nodes[ni].x;
+            if (nodes[ni].x > mxx) mxx = nodes[ni].x;
+            if (nodes[ni].y < mny) mny = nodes[ni].y;
+            if (nodes[ni].y > mxy) mxy = nodes[ni].y;
+        }
+        cl._minX = mnx; cl._maxX = mxx; cl._minY = mny; cl._maxY = mxy;
+        return cl;
     }
     for (var c0 = 0; c0 < targetCount(); c0++) clusters.push(spawnCluster());
 
@@ -251,10 +285,11 @@
         return false;
     }
 
-    var K = 0.02;       // spring stiffness
-    var RELAX = 0.985;  // decay of velocity relative to the drift
+    var K = 0.015;      // spring stiffness
+    var RELAX = 0.95;   // decay of velocity relative to the drift
     var PUSH_R = 60, PUSH_F = 0.08;
-    var REP_R = 26, REP_F = 0.015; // slight node-node repulsion at close range
+    var REP_R = 38, REP_F = 0.035; // node-node dispersion
+    var EREP_R = 20, EREP_F = 0.055; // edge-node dispersion (keeps nodes off edges)
     var MAXS = 2.2; // edges clamp at this multiple of rest length (plus a little slack)
 
     function step() {
@@ -272,7 +307,7 @@
                 if (rdx > REP_R || rdx < -REP_R || rdy > REP_R || rdy < -REP_R) continue;
                 var rd = Math.hypot(rdx, rdy);
                 if (rd < REP_R && rd > 0.5) {
-                    var rf = REP_F * (1 - rd / REP_R) / rd;
+                    var rf = REP_F * ((ra._rep + rb._rep) * 0.5 || 1) * (1 - rd / REP_R) / rd;
                     ra.vx -= rdx * rf; ra.vy -= rdy * rf;
                     rb.vx += rdx * rf; rb.vy += rdy * rf;
                 }
@@ -285,9 +320,30 @@
                 var s = sp[i], a = ns[s.i], b = ns[s.j];
                 var dx = b.x - a.x, dy = b.y - a.y;
                 var d = Math.hypot(dx, dy) || 1;
-                var f = K * (d - s.rest) / d;
+                var f = K * cl.kMul * (d - s.rest) / d;
                 a.vx += dx * f; a.vy += dy * f;
                 b.vx -= dx * f; b.vy -= dy * f;
+            }
+            // push nodes off edges they are not part of (with equal and
+            // opposite reaction on the edge's endpoints)
+            for (i = 0; i < sp.length; i++) {
+                var se = sp[i], ea = ns[se.i], eb = ns[se.j];
+                var abx = eb.x - ea.x, aby = eb.y - ea.y;
+                var ab2 = abx * abx + aby * aby || 1;
+                for (var q = 0; q < ns.length; q++) {
+                    if (q === se.i || q === se.j) continue;
+                    var nq = ns[q];
+                    var tq = ((nq.x - ea.x) * abx + (nq.y - ea.y) * aby) / ab2;
+                    if (tq < 0.05 || tq > 0.95) continue;
+                    var ex = nq.x - (ea.x + abx * tq), ey = nq.y - (ea.y + aby * tq);
+                    var ed = Math.hypot(ex, ey);
+                    if (ed >= EREP_R) continue;
+                    if (ed < 0.01) { ex = -aby; ey = abx; ed = Math.hypot(ex, ey) || 1; }
+                    var ef = EREP_F * cl.repMul * (1 - ed / EREP_R) / ed;
+                    nq.vx += ex * ef; nq.vy += ey * ef;
+                    ea.vx -= ex * ef * (1 - tq); ea.vy -= ey * ef * (1 - tq);
+                    eb.vx -= ex * ef * tq; eb.vy -= ey * ef * tq;
+                }
             }
             var ims = imagesFor(cl);
             for (i = 0; i < ns.length; i++) {
@@ -308,8 +364,8 @@
                             n.vy += T.inv.m10 * mdx * mf + T.inv.m11 * mdy * mf;
                         }
                     }
-                    n.vx = cl.bvx + (n.vx - cl.bvx) * RELAX;
-                    n.vy = cl.bvy + (n.vy - cl.bvy) * RELAX;
+                    n.vx = cl.bvx + (n.vx - cl.bvx) * (cl.relax || RELAX);
+                    n.vy = cl.bvy + (n.vy - cl.bvy) * (cl.relax || RELAX);
                 }
                 n.x += n.vx; n.y += n.vy;
             }
@@ -362,6 +418,7 @@
     function draw() {
         ctx.clearRect(0, 0, W, H);
         var c, i, t;
+        ctx.lineWidth = 0.8;
         ctx.strokeStyle = colors.edge;
         for (c = 0; c < clusters.length; c++) {
             var cl = clusters[c], ns = cl.nodes, ims = imagesFor(cl);
@@ -394,8 +451,12 @@
     }
 
     if (reduced) { draw(); return; }
+    // phones hide the canvas entirely — skip the simulation there too so it
+    // costs no battery (picks back up live if the window widens)
+    var smallScreen = window.matchMedia ? matchMedia('(max-width: 768px)') : { matches: false };
     function frame() {
-        if (!document.hidden && W > 0) { step(); draw(); }
+        if (!document.hidden && W > 0 && !smallScreen.matches &&
+            !document.body.hasAttribute('data-field-off')) { step(); draw(); }
         requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);

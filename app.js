@@ -1,4 +1,42 @@
 (function() {
+    // Heavy note-rendering libraries (KaTeX + mhchem, marked, smiles-drawer)
+    // load lazily: the landing page never pays for them. They prefetch in the
+    // background once the page is idle, so by the time a note is opened they
+    // are almost always already in cache.
+    var libsPromise = null;
+    function loadScript(src) {
+        return new Promise(function(resolve, reject) {
+            var sc = document.createElement('script');
+            sc.src = src; sc.onload = resolve; sc.onerror = reject;
+            document.head.appendChild(sc);
+        });
+    }
+    function loadCss(href) {
+        return new Promise(function(resolve) {
+            var l = document.createElement('link');
+            l.rel = 'stylesheet'; l.href = href;
+            l.onload = resolve; l.onerror = resolve;
+            document.head.appendChild(l);
+        });
+    }
+    function loadLibs() {
+        if (!libsPromise) {
+            libsPromise = Promise.all([
+                loadCss('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.11/katex.min.css'),
+                loadScript('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.11/katex.min.js')
+                    .then(function() { return loadScript('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.11/contrib/mhchem.min.js'); }),
+                loadScript('https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js'),
+                loadScript('https://cdn.jsdelivr.net/npm/smiles-drawer@2.1.7/dist/smiles-drawer.min.js').catch(function() {})
+            ]);
+        }
+        return libsPromise;
+    }
+    window.addEventListener('load', function() {
+        var warm = function() { loadLibs(); };
+        if (window.requestIdleCallback) requestIdleCallback(warm, { timeout: 4000 });
+        else setTimeout(warm, 1500);
+    });
+
     // Each .panel-content with a data-src attribute is filled from its section
     // file in sections/ before the rest of the page logic runs.
     function loadSections() {
@@ -182,12 +220,15 @@
                 container.innerHTML = '<p>Note not found. <a href="#notebook">../</a></p>';
                 return;
             }
-            fetch('notebook/' + slug + '.md')
-                .then(function(res) {
+            Promise.all([
+                fetch('notebook/' + slug + '.md').then(function(res) {
                     if (!res.ok) throw new Error(res.status + ' ' + res.statusText);
                     return res.text();
-                })
-                .then(function(md) {
+                }),
+                loadLibs()
+            ])
+                .then(function(both) {
+                    var md = both[0];
                     container.innerHTML =
                         '<p class="note-back"><a href="#notebook">../</a></p>' +
                         '<div class="note-body">' + renderMarkdown(md) + '</div>';
@@ -216,6 +257,7 @@
                 sidebar.classList.toggle('sidebar--contact', sectionId === 'contact');
             }
             document.body.classList.toggle('no-sidebar', sectionId === 'notebook');
+            document.documentElement.classList.toggle('no-scroll', sectionId !== 'notebook');
             document.body.classList.toggle('note-open', sectionId === 'notebook' && !!sub);
             if (sectionId === 'notebook') renderNotebook(sub);
             if (history.replaceState) history.replaceState(null, '', '#' + sectionId + (sub ? '/' + sub : ''));
@@ -264,11 +306,30 @@
     var accentMenu = null;
     function closeAccentMenu() {
         if (accentMenu) { accentMenu.remove(); accentMenu = null; }
+        var gearBtn = document.getElementById('settings-btn');
+        if (gearBtn) gearBtn.classList.remove('open');
+        var controls = document.querySelector('.top-controls');
+        if (controls) controls.classList.remove('open');
     }
     function openAccentMenu() {
         closeAccentMenu();
         accentMenu = document.createElement('div');
         accentMenu.className = 'accent-menu';
+        // leftmost: toggle the background universe
+        var ft = document.createElement('button');
+        ft.type = 'button';
+        ft.className = 'field-toggle' + (document.body.hasAttribute('data-field-off') ? ' off' : '');
+        ft.title = 'background universe on/off';
+        ft.textContent = '\u2234';
+        ft.addEventListener('click', function() {
+            var off = document.body.toggleAttribute('data-field-off');
+            ft.classList.toggle('off', off);
+            try {
+                if (off) localStorage.setItem('riensou-field', 'off');
+                else localStorage.removeItem('riensou-field');
+            } catch (e) {}
+        });
+        accentMenu.appendChild(ft);
         var current = document.body.getAttribute('data-accent') || 'green';
         ACCENTS.forEach(function(a) {
             var b = document.createElement('button');
@@ -284,11 +345,28 @@
                     document.body.setAttribute('data-accent', a[0]);
                     try { localStorage.setItem('riensou-accent', a[0]); } catch (e) {}
                 }
-                closeAccentMenu();
+                accentMenu.querySelectorAll('button').forEach(function(btn) {
+                    if (!btn.classList.contains('field-toggle')) btn.classList.remove('current');
+                });
+                b.classList.add('current');
             });
             accentMenu.appendChild(b);
         });
-        document.body.appendChild(accentMenu);
+        var controls = document.querySelector('.top-controls');
+        var gearBtn = document.getElementById('settings-btn');
+        if (controls) {
+            controls.insertBefore(accentMenu, controls.firstChild);
+            controls.classList.add('open');
+        } else document.body.appendChild(accentMenu);
+        if (gearBtn) gearBtn.classList.add('open');
+    }
+    var settingsBtn = document.getElementById('settings-btn');
+    if (settingsBtn) {
+        settingsBtn.addEventListener('click', function() {
+            if (accentMenu) closeAccentMenu();
+            else openAccentMenu();
+        });
+        settingsBtn.title = 'accent color \u00b7 background universe';
     }
     if (darkBtn) {
         darkBtn.addEventListener('contextmenu', function(e) {
@@ -296,10 +374,9 @@
             if (accentMenu) closeAccentMenu();
             else openAccentMenu();
         });
-        darkBtn.title = 'click: light/dark \u00b7 right-click: accent color';
     }
     document.addEventListener('mousedown', function(e) {
-        if (accentMenu && !accentMenu.contains(e.target) && e.target !== darkBtn) closeAccentMenu();
+        if (accentMenu && !accentMenu.contains(e.target) && e.target !== darkBtn && e.target !== settingsBtn) closeAccentMenu();
     });
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') closeAccentMenu();

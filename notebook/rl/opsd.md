@@ -83,7 +83,7 @@ $$\mathcal{L}_\text{OPSD}(\theta)=-\mathbb{E}_{(x,y)\sim\pi_S(y\mid x)}\left[\su
 
 <p id="parallelism"><sup>1</sup> Note that the parallelism column refers to how many model responses per prompt the training signal needs, not how the algorithms themselves can be run once the data is collected.</p>
 
-<p id="fn-condition"><sup>2</sup> This isssuming that $\pi^* $ is attainable and that MLE reaches its optimum.</p> 
+<p id="fn-condition"><sup>2</sup> This is assuming that $\pi^* $ is attainable and that MLE reaches its optimum.</p> 
 
 <p id="fn-advantage"><sup>3</sup> This can be thought of as how much better or worse an action was than expected. A common estimate is $\hat{A}_t=G_t-V(s_t)$ where $G_t$ is the observed return from $t$ onward and $V(s_t)$ is the value function's predicted return from state $s_t$.</p>
 

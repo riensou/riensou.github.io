@@ -34,7 +34,7 @@ $$
 where $\Phi$ is a function of $\hat\mu_y$. In the case of $\text{loss}(p,y)=(p-y)^2$, it is easy to solve for the value of $\Phi(\hat\mu_y)$. Differentiate $\mathcal{L}(\{p,y\})$ w.r.t. $p$ and solve for $p$ when the derivative equals $0$.
 $$\frac{d\mathcal{L}}{dp}=2\left(\hat\mu_y(p-1)+(1-\hat\mu_y)p\right)=2(p-\hat\mu_y)$$
 $$\frac{d\mathcal{L}}{dp}=0\implies p=\hat\mu_y$$
-This tells us that for the case where we score according to $\text{loss}(p,y)=(p-y)^2$, it is optimal to predict that average outcome in order ot minimize loss.
+This tells us that for the case where we score according to $\text{loss}(p,y)=(p-y)^2$, it is optimal to predict that average outcome in order to minimize loss.
 
 Suppose that paired with each outcome $y_i$, we have it paired with some *features* $x_i$. We can reformulate our setup as 
 

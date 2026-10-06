@@ -6,11 +6,11 @@ Auditing CS 294-314 Forecasting: A Critical Retrospective taught by Ben Recht. C
 
 Scientists of the 17th century were aware of achievements of the past, especially astronomers. One such astronomer, Edmond Halley, was greatly interested in the human history of science. 
 
-Halley used modern data (lunar tables) to provide further context to classical history (Caesar's invasian of Britain). 
+Halley used modern data (lunar tables) to provide further context to classical history (Caesar's invasion of Britain). 
 
 > what binds all of Halley's writings together is measurement
 
-Halley was most interested in meteorology, the early history of Earth's formation, geomagenetism, and cosmology. He may have believed in the infinitness of the universe, or potentially in the idea that the world was chaos before God set things in motion to lead to humans as explained in *Genesis*.
+Halley was most interested in meteorology, the early history of Earth's formation, geomagnetism, and cosmology. He may have believed in the infiniteness of the universe, or potentially in the idea that the world was chaos before God set things in motion to lead to humans as explained in *Genesis*.
 
 Halley introduced a model of atmospheric equilibria, detailing how winds and weather patterns can emerge from the rising warm and descending cold air. He connects this to the Sun's motion, and realizes that land masses introduce local complexities. He then further reasons about the water cycle, theorizing that rain alone would not be enough to fill up rivers, and that some mechanism of constant condensation would be necessary. 
 

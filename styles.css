@@ -36,16 +36,9 @@ body[data-accent="purple"] { --accent: #6a3d8a; --accent-hover: #4d2a66; --borde
 body.dark-mode[data-accent="purple"] { --accent: #a97dd6; --accent-hover: #c39de8; --border-accent: #4d3d5c; }
 
 .accent-menu {
-    position: fixed;
-    top: 0;
-    right: 3.6rem;
-    height: calc(2.5rem - 1px);
     display: flex;
     align-items: center;
     gap: 0.6rem;
-    z-index: 20;
-    background: var(--bg);
-    padding: 0 0.6rem;
 }
 .accent-menu button {
     padding: 0;
@@ -55,6 +48,20 @@ body.dark-mode[data-accent="purple"] { --accent: #a97dd6; --accent-hover: #c39de
     display: flex;
     align-items: center;
 }
+.accent-menu .field-toggle {
+    color: var(--accent);
+    font-size: 0.95rem;
+    padding-right: 0.6rem;
+    margin-right: 0.15rem;
+    border-right: 1px solid var(--border);
+}
+.accent-menu .field-toggle.off { color: var(--text-muted); }
+.accent-menu button:last-child {
+    padding-right: 0.75rem;
+    margin-right: 0.15rem;
+    border-right: 1px solid var(--border);
+}
+body[data-field-off] #sidebar-field { display: none; }
 .accent-menu .swatch {
     width: 0.7rem;
     height: 0.7rem;
@@ -181,9 +188,27 @@ body.no-sidebar #sidebar-field { clip-path: inset(0); }
     z-index: 10;
 }
 .top-nav-spacer { flex: 1; min-width: 0; }
-.dark-mode-btn {
+.top-controls {
     position: absolute;
     right: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+}
+.settings-btn {
+    padding: 0;
+    font-size: 0.85rem;
+    font-family: inherit;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: color 0.15s ease;
+}
+.settings-btn:hover, .settings-btn.open { color: var(--accent); }
+.top-controls.open .dark-mode-btn { display: inline-block; }
+.dark-mode-btn {
+    display: none;
     padding: 0;
     font-size: 0.8rem;
     font-family: inherit;
@@ -222,6 +247,15 @@ body.no-sidebar #sidebar-field { clip-path: inset(0); }
     flex: 1;
     padding: 1.5rem 1.75rem 3rem 1.5rem;
     min-height: calc(100vh - 2.5rem);
+}
+/* single-screen tabs (about/contact/music) don't scroll at all on desktop;
+   the notebook keeps scrolling for long lists and notes */
+@media (min-width: 769px) {
+    html.no-scroll, html.no-scroll body {
+        overflow: hidden;
+        height: 100%;
+        overscroll-behavior: none;
+    }
 }
 body.no-sidebar .sidebar { display: none; }
 body.no-sidebar .main { margin-left: 0; }
@@ -416,4 +450,22 @@ a:hover { color: var(--accent-hover); text-decoration: underline; }
     .sidebar-photo-contact { margin: 0; max-width: 64px; }
     .main { margin-left: 0; margin-top: 0; padding: 1rem; min-height: 100vh; }
     .project-card-img { width: 80px; min-width: 80px; height: 60px; }
+    /* notebook tree: no sidebar-divider alignment on phones (240px margin
+       would push the tree off a narrow screen) */
+    body.no-sidebar:not(.note-open) #notebook-panel .panel-content { margin: 0; }
+    /* keep wrapped nav links from sliding under the gear */
+    .top-nav { padding-right: 3.2rem; }
+    /* settings strip drops below the bar instead of overlapping the nav */
+    .top-controls .accent-menu {
+        position: absolute;
+        top: calc(100% + 0.5rem);
+        right: 0;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        padding: 0.45rem 0.7rem;
+    }
+    /* wide tables scroll sideways instead of blowing out the page */
+    .note-body table { display: block; overflow-x: auto; max-width: 100%; }
 }
+/* display math scrolls sideways when wider than the column (mainly phones) */
+.note-body .katex-display { overflow-x: auto; overflow-y: hidden; }

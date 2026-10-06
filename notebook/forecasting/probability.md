@@ -31,7 +31,7 @@ It turns out that to be a "good" (where good refers to having a good score) fore
 A forecast is calibrated if on the events where one predicts $p=\alpha$, then the associated outcome occurs with frequency $\alpha$.
 $$\mathbb{E}\left[Y=1\mid p=\alpha\right]=\alpha$$
 
-Recall the Brior Score (BS): $\sum_{i=1}^n(p_i-y_i)^2$. Note that for $y_i=(-1)^i$, and $p_i=0.5$, our prediction is calibrated, but not good. Conversely, a small Brior Score need not imply a calibrated prediction.
+Recall the Brier Score (BS): $\sum_{i=1}^n(p_i-y_i)^2$. Note that for $y_i=(-1)^i$, and $p_i=0.5$, our prediction is calibrated, but not good. Conversely, a small Brier Score need not imply a calibrated prediction.
 
 ## Proper Scoring Rules
 
